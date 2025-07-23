@@ -1,16 +1,63 @@
 {
   "name": "dunlopillo-motionbed-spa",
   "version": "1.0.0",
-  "description": "던롭필로 모션베드 체험 SPA",
+  "description": "던롭필로 모션베드 및 라텍스 매트리스 체험을 위한 인터랙티브 19페이지 SPA 애플리케이션",
   "main": "index.html",
-  "scripts": {
-    "start": "npx serve .",
-    "build": "echo 'No build needed - static site'",
-    "dev": "npx serve . -l 3000"
+  "homepage": "https://digisys-admin.github.io/dunlopillo-motionbed-spa",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digisys-admin/dunlopillo-motionbed-spa.git"
   },
-  "keywords": ["dunlopillo", "motionbed", "spa", "static"],
-  "author": "Digisys",
+  "bugs": {
+    "url": "https://github.com/digisys-admin/dunlopillo-motionbed-spa/issues"
+  },
+  "scripts": {
+    "start": "npx serve . -l 5500",
+    "dev": "npx serve . -l 3000 --cors",
+    "build": "echo '✅ Static site - no build needed'",
+    "preview": "npx serve . -l 8080",
+    "backup": "tar -czf backup_$(date +%Y%m%d_%H%M).tar.gz --exclude=node_modules --exclude=.git .",
+    "restore-assets": "echo '📁 Please manually restore assets/ folder from backup'",
+    "test-audio": "echo '🎵 Open browser console and run: window.testPage3Voice()'",
+    "clean": "rm -rf .DS_Store **/.DS_Store",
+    "deploy": "echo '🚀 Push to main branch for auto-deploy via Netlify'"
+  },
+  "keywords": [
+    "dunlopillo", 
+    "motionbed", 
+    "spa", 
+    "static", 
+    "interactive",
+    "audio-guide",
+    "kiosk",
+    "korean",
+    "mattress",
+    "latex"
+  ],
+  "author": {
+    "name": "DigiSys Admin",
+    "email": "sh_sohn@digisys.co.kr",
+    "url": "https://github.com/digisys-admin"
+  },
   "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie 11"
+  ],
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "files": [
+    "index.html",
+    "styles.css",
+    "script.js",
+    "screens.js", 
+    "survey-data.js",
+    "netlify.toml",
+    "README.md"
+  ]
 }

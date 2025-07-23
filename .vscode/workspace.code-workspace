@@ -1,0 +1,92 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "liveServer.settings.port": 5500,
+    "liveServer.settings.CustomBrowser": "chrome",
+    "liveServer.settings.donotShowInfoMsg": true,
+    "liveServer.settings.donotVerifyTags": true,
+    "files.associations": {
+      "*.js": "javascript",
+      "*.html": "html",
+      "*.css": "css"
+    },
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact"
+    },
+    "editor.formatOnSave": true,
+    "html.format.indentInnerHtml": true,
+    "css.validate": true,
+    "js.validate.enable": true,
+    "files.exclude": {
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/*.log": true
+    },
+    "search.exclude": {
+      "**/assets/voices": true,
+      "**/assets/pics": true,
+      "**/.git": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ritwickdey.liveserver",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-json",
+      "bradlc.vscode-tailwindcss",
+      "formulahendry.auto-rename-tag",
+      "ms-vscode.hexeditor"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Start Live Server",
+        "type": "shell",
+        "command": "npx",
+        "args": ["serve", ".", "-l", "5500"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🎵 Test Audio System",
+        "type": "shell",
+        "command": "echo",
+        "args": ["브라우저 콘솔에서 'window.testPage3Voice()' 실행"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always"
+        }
+      },
+      {
+        "label": "📦 Create Backup",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "backup"],
+        "group": "build"
+      },
+      {
+        "label": "🧹 Clean DS_Store",
+        "type": "shell", 
+        "command": "npm",
+        "args": ["run", "clean"],
+        "group": "build"
+      }
+    ]
+  }
+}

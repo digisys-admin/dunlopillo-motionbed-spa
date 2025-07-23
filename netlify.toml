@@ -1,13 +1,51 @@
-redirectsOrigin = "config"
-plugins = []
-headers = []
-
-[functions]
-
-  [functions."*"]
-
+# Netlify 배포 설정
 [build]
-publish = "/Users/willysohn/Desktop/VS code/brands/dunlopillo/motionbed-spa"
+  publish = "."
+  command = "echo '✅ Static site deployed successfully'"
+
+# HTTP 헤더 설정  
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 오디오 파일 캐싱
+[[headers]]
+  for = "*.mp3"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# HTML, CSS, JS 캐싱  
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# 리다이렉트 설정 (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"], Country = ["US"]}
+
+# 개발 환경 설정
+[dev]
+  command = "npx serve . -l 8888"
+  port = 8888
+  publish = "."
 publishOrigin = "config"
 
   [build.environment]
