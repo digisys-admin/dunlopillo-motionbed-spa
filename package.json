@@ -1,0 +1,16 @@
+{
+  "name": "dunlopillo-motionbed-spa",
+  "version": "1.0.0",
+  "description": "던롭필로 모션베드 체험 SPA",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'No build needed - static site'",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": ["dunlopillo", "motionbed", "spa", "static"],
+  "author": "Digisys",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

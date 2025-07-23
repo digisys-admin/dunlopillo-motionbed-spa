@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <!-- 폰트 최적화: font-display 적용 및 CDN 폰트 직접 로딩 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css"></noscript>
+    
+    <!-- 메인 스타일시트 -->
+    <link rel="stylesheet" href="styles.css" />
+    <title>Dunlopillo SPA</title>
+  </head>
+  <body>
+    <!-- 글로벌 구조: 전체 바탕(찐한 회색) + 화면(1280x800 옅은 회색) -->
+    <div class="screen-container" id="app">
+      <!-- 여기에 각 페이지 컨텐츠가 렌더링됩니다 -->
+    </div>
+    
+    <!-- JavaScript 파일들 - 순서 중요! -->
+    <script src="survey-data.js"></script>
+    <script src="screens.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- 배경 음악 시스템 (자동 재생) -->
+    <audio id="backgroundAudio" loop preload="auto" style="display: none;">
+      <source src="https://res.cloudinary.com/di2pd92t1/video/upload/v1748237173/Dunlopillo-Crash-Test-Flexibilitet-web_n045ph.mp4" type="audio/mp4">
+      <source src="https://res.cloudinary.com/di2pd92t1/video/upload/v1748237657/Dunlopillo-Crash-Test-Stabilitet-web_mvxr27.mp4" type="audio/mp4">
+    </audio>
+    
+    <!-- 디버깅용 간단한 테스트 -->
+    <script>
+      console.log('📝 HTML 로딩 완료');
+      console.log('🔍 screens 객체 확인:', typeof window.screens);
+      console.log('🔍 surveyData 객체 확인:', typeof window.surveyData);
+      
+      // 동영상 디버깅
+      console.log('🎬 VIDEO_SOURCES 확인:', window.VIDEO_SOURCES);
+      console.log('🎬 USE_VIDEO_BACKGROUND 확인:', window.USE_VIDEO_BACKGROUND);
+      
+      // 🎵 배경 음악 자동 재생 시스템
+      let backgroundAudio = null;
+      let currentAudioIndex = 0;
+      let isMusicEnabled = true; // 음악 활성화 상태 (전역 유지)
+      
+      // 🎙️ AI 음성 가이드 시스템 (한 번만 선언)
+      let voiceAudio = null;
+      let isVoiceEnabled = true;
+      let isVoicePlaying = false;
+      let userHasInteracted = false; // 사용자 상호작용 확인
+      
+      // ⏰ 자동 진행 시스템
+      let autoProgressTimer = null;
+      let countdownTimer = null;
+      let currentCountdown = 0;
+      let isAutoProgressActive = false;
+      
+      // 배경 음악 소스들 (동영상에서 오디오만 추출)
+      const BACKGROUND_AUDIO_SOURCES = [
+        'https://res.cloudinary.com/di2pd92t1/video/upload/v1748237173/Dunlopillo-Crash-Test-Flexibilitet-web_n045ph.mp4',
+        'https://res.cloudinary.com/di2pd92t1/video/upload/v1748237657/Dunlopillo-Crash-Test-Stabilitet-web_mvxr27.mp4',
+        'https://res.cloudinary.com/di2pd92t1/video/upload/v1748241410/Dunlopillo-Crash-Test-Allergivenlig-A%CC%8Andba%CC%8Ar-web_wxolsb.mp4'
+      ];
+
+      // 페이지별 음성 파일 매핑 (실제 로컬 파일 기준)
+      const VOICE_SCRIPTS = {
+        'page3': 'assets/voices/voice_page3.mp3',
+        'page4': 'assets/voices/voice_page4.mp3', 
+        'page5': 'assets/voices/voice_page5.mp3',
+        'page7': 'assets/voices/voice_page7.mp3',
+        'page8': 'assets/voices/voice_page8.mp3',
+        'page10': 'assets/voices/voice_page10.mp3',
+        'page11': 'assets/voices/voice_page11.mp3',
+        'page12': 'assets/voices/voice_page12.mp3',
+        'page13': 'assets/voices/voice_page13.mp3',
+        'page15': 'assets/voices/voice_page15.mp3',
+        'page17': 'assets/voices/voice_page17.mp3'
+      };
+
+      // 전역에서 접근 가능하도록 설정
+      window.VOICE_SCRIPTS = VOICE_SCRIPTS;
+
+      // ⏰ 자동 진행 설정 (페이지별)
+      const AUTO_PROGRESS_CONFIG = {
+        // 음성 안내 있는 페이지들 (음성 종료 후 5초)
+        'page3': { hasVoice: true, delay: 5 },
+        'page4': { hasVoice: true, delay: 5 },
+        'page5': { hasVoice: true, delay: 5 },
+        'page7': { hasVoice: true, delay: 5 },
+        'page8': { hasVoice: true, delay: 5 },
+        'page10': { hasVoice: true, delay: 5 },
+        'page11': { hasVoice: true, delay: 5 },
+        'page12': { hasVoice: true, delay: 5 },
+        'page13': { hasVoice: true, delay: 5 },
+        'page15': { hasVoice: true, delay: 5 },
+        'page17': { hasVoice: true, delay: 5 },
+        
+        // 음성 안내 없는 페이지들 (7초 후 자동 진행) - page3부터 시작
+        'page6': { hasVoice: false, delay: 7 },
+        'page9': { hasVoice: false, delay: 7 },
+        'page14': { hasVoice: false, delay: 7 },
+        'page16': { hasVoice: false, delay: 7 },
+        'page18': { hasVoice: false, delay: 7 },
+        'page19': { hasVoice: false, delay: 7 },
+        'page20': { hasVoice: false, delay: 7 }
+        // page1, page2는 자동 진행 없음
+      };
+
+      function initBackgroundMusic() {
+        // 배경 음악 요소 생성
+        backgroundAudio = document.createElement('audio');
+        backgroundAudio.loop = false; // 개별 트랙이 끝나면 다음으로
+        backgroundAudio.volume = 1.0; // 최대 볼륨 (100%)
+        backgroundAudio.preload = 'auto';
+        
+        // 첫 번째 소스 설정
+        backgroundAudio.src = BACKGROUND_AUDIO_SOURCES[currentAudioIndex];
+        
+        // 트랙 종료 시 다음 트랙으로 자동 전환
+        backgroundAudio.addEventListener('ended', () => {
+          currentAudioIndex = (currentAudioIndex + 1) % BACKGROUND_AUDIO_SOURCES.length;
+          backgroundAudio.src = BACKGROUND_AUDIO_SOURCES[currentAudioIndex];
+          if (isMusicEnabled) {
+            backgroundAudio.play().catch(error => {
+              console.warn('다음 트랙 재생 실패:', error);
+            });
+          }
+        });
+        
+        // 전역에서 접근 가능하도록 설정
+        window.backgroundMusicSystem = {
+          audio: backgroundAudio,
+          toggle: toggleBackgroundMusic,
+          isEnabled: () => isMusicEnabled,
+          syncWithHomeVideo: syncMusicWithHomeVideo
+        };
+        
+        console.log('🎵 배경 음악 시스템 초기화 완료');
+      }
+
+      // 🎙️ AI 음성 가이드 시스템 초기화
+      function initVoiceGuide() {
+        voiceAudio = document.createElement('audio');
+        voiceAudio.volume = 0.8; // 음성은 배경음악보다 크게
+        voiceAudio.preload = 'auto';
+        
+        // 음성 로딩 완료
+        voiceAudio.addEventListener('loadeddata', () => {
+          console.log('🎙️ [DEBUG] 음성 파일 로드 완료:', voiceAudio.src);
+        });
+
+        // 음성 로딩 시작
+        voiceAudio.addEventListener('loadstart', () => {
+          console.log('🎙️ [DEBUG] 음성 파일 로딩 시작:', voiceAudio.src);
+        });
+        
+        // 음성 재생 완료 시 배경음악 복구 + 자동 진행 시작
+        voiceAudio.addEventListener('ended', () => {
+          isVoicePlaying = false;
+          restoreBackgroundMusicVolume();
+          console.log('🎙️ 음성 가이드 재생 완료');
+          
+          // 음성 종료 후 자동 진행 시작
+          const currentPage = getCurrentPageName();
+          const config = AUTO_PROGRESS_CONFIG[currentPage];
+          if (config && config.hasVoice) {
+            console.log(`⏰ [AUTO] 음성 종료 → 자동 진행 시작 (${config.delay}초)`);
+            startCountdown(config.delay);
+          }
+        });
+
+        // 음성 재생 오류 처리
+        voiceAudio.addEventListener('error', (e) => {
+          console.error('🎙️ ❌ 음성 가이드 재생 실패:', e);
+          console.error('🎙️ [ERROR] 오류 코드:', voiceAudio.error?.code);
+          console.error('🎙️ [ERROR] 오류 메시지:', voiceAudio.error?.message);
+          console.error('🎙️ [ERROR] 파일 경로:', voiceAudio.src);
+          isVoicePlaying = false;
+          restoreBackgroundMusicVolume();
+        });
+
+        // 전역 접근 가능하도록 설정
+        window.voiceGuideSystem = {
+          audio: voiceAudio,
+          playVoiceForPage: playVoiceForPage,
+          stopVoice: stopVoice,
+          isEnabled: () => isVoiceEnabled,
+          toggle: toggleVoiceGuide
+        };
+
+        // ⏰ 자동 진행 시스템도 전역 접근 가능하도록 설정
+        window.startAutoProgress = startAutoProgress;
+        window.clearAutoProgress = clearAutoProgress;
+        window.AUTO_PROGRESS_CONFIG = AUTO_PROGRESS_CONFIG;
+
+        console.log('🎙️ AI 음성 가이드 시스템 초기화 완료');
+      }
+
+      // ⏰ 자동 진행 시스템
+      function startAutoProgress(pageName) {
+        console.log(`⏰ [AUTO] 자동 진행 시작: ${pageName}`);
+        
+        // 기존 타이머들 정리
+        clearAutoProgress();
+        
+        const config = AUTO_PROGRESS_CONFIG[pageName];
+        if (!config) {
+          console.log(`⏰ [AUTO] 자동 진행 설정 없음: ${pageName}`);
+          return;
+        }
+
+        isAutoProgressActive = true;
+        
+        if (config.hasVoice && VOICE_SCRIPTS[pageName]) {
+          // 음성 안내 페이지: 음성 종료 후 카운트다운 시작
+          console.log(`⏰ [AUTO] 음성 종료 대기 중...`);
+          // 음성 종료는 voiceAudio의 'ended' 이벤트에서 처리
+        } else {
+          // 일반 페이지: 즉시 카운트다운 시작
+          startCountdown(config.delay);
+        }
+      }
+
+      function startCountdown(seconds) {
+        if (!isAutoProgressActive) return;
+        
+        console.log(`⏰ [AUTO] 카운트다운 시작: ${seconds}초`);
+        currentCountdown = seconds;
+        updateNextButtonText();
+        
+        countdownTimer = setInterval(() => {
+          currentCountdown--;
+          updateNextButtonText();
+          
+          if (currentCountdown <= 0) {
+            clearAutoProgress();
+            autoGoToNextPage();
+          }
+        }, 1000);
+      }
+
+      function updateNextButtonText() {
+        // 다양한 버튼 클래스 시도
+        const nextButton = document.querySelector('.nav-btn.next-btn') || 
+                          document.querySelector('.navigation-button.next') ||
+                          document.querySelector('button[onclick*="next()"]') ||
+                          document.querySelector('button:contains("다음")');
+                          
+        console.log(`⏰ [DEBUG] 다음 버튼 찾기:`, nextButton);
+        
+        if (nextButton && isAutoProgressActive) {
+          const originalText = nextButton.textContent.includes('다음') ? '다음>' : '다음';
+          nextButton.textContent = `다음 (${currentCountdown})`;
+          
+          // 부드러운 선형 프로그레스 효과 (이전 버튼 색 → 다음 버튼 색)
+          const totalSeconds = AUTO_PROGRESS_CONFIG[getCurrentPageName()]?.delay || 7;
+          const progress = ((totalSeconds - currentCountdown) / totalSeconds) * 100;
+          
+          // 기존 배경색을 한 번만 저장
+          if (!nextButton.dataset.originalBackground) {
+            const computedStyle = window.getComputedStyle(nextButton);
+            nextButton.dataset.originalBackground = computedStyle.backgroundColor || '#1e40af';
+            nextButton.dataset.originalBorder = computedStyle.border || '';
+            nextButton.dataset.originalColor = computedStyle.color || '';
+            console.log(`⏰ [DEBUG] 원래 스타일 저장:`, {
+              background: nextButton.dataset.originalBackground,
+              border: nextButton.dataset.originalBorder,
+              color: nextButton.dataset.originalColor
+            });
+          }
+          
+          // 이전 버튼 색상(회색)에서 다음 버튼 색상(파란색)으로 채우기
+          const prevButtonColor = '#6b7280'; // 이전 버튼 회색 (#primary-gray)
+          const nextButtonColor = '#1e40af'; // 다음 버튼 파란색 (#primary-blue)
+          
+          // 부드러운 그라데이션으로 왼쪽부터 채우기
+          nextButton.style.background = `linear-gradient(
+            to right, 
+            ${nextButtonColor} 0%, 
+            ${nextButtonColor} ${progress}%, 
+            ${prevButtonColor} ${progress}%, 
+            ${prevButtonColor} 100%
+          )`;
+          
+          // 부드러운 전환 효과 추가
+          nextButton.style.transition = 'background 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+          nextButton.style.backgroundSize = '100% 100%';
+          nextButton.style.backgroundRepeat = 'no-repeat';
+          
+          console.log(`⏰ [DEBUG] 프로그레스 버튼 업데이트: ${nextButton.textContent}, 진행도: ${progress.toFixed(1)}% (회색→파란색)`);
+        } else {
+          console.log(`⏰ [DEBUG] 다음 버튼을 찾을 수 없음 또는 자동 진행 비활성화`);
+        }
+      }
+
+      function autoGoToNextPage() {
+        console.log(`⏰ [AUTO] 자동으로 다음 페이지 이동`);
+        
+        // 다양한 방법으로 다음 버튼 찾기
+        const nextButton = document.querySelector('.nav-btn.next-btn') || 
+                          document.querySelector('.navigation-button.next') ||
+                          document.querySelector('button[onclick*="next()"]');
+                          
+        console.log(`⏰ [DEBUG] 자동 클릭할 버튼:`, nextButton);
+        
+        if (nextButton && !nextButton.disabled) {
+          nextButton.click();
+        } else {
+          // 버튼을 못 찾으면 직접 next() 함수 호출
+          if (window.app && typeof window.app.next === 'function') {
+            window.app.next();
+            console.log(`⏰ [AUTO] app.next() 직접 호출`);
+          }
+        }
+      }
+
+      function clearAutoProgress() {
+        if (autoProgressTimer) {
+          clearTimeout(autoProgressTimer);
+          autoProgressTimer = null;
+        }
+        
+        if (countdownTimer) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+        }
+        
+        isAutoProgressActive = false;
+        currentCountdown = 0;
+        
+        // 다음 버튼 스타일 복구 (부드러운 전환 효과 포함)
+        const nextButton = document.querySelector('.nav-btn.next-btn') || 
+                          document.querySelector('.navigation-button.next') ||
+                          document.querySelector('button[onclick*="next()"]');
+                          
+        if (nextButton) {
+          // 원래 텍스트로 복구
+          const baseText = nextButton.textContent.includes('>') ? '다음>' : '다음';
+          nextButton.textContent = baseText;
+          
+          // 부드러운 스타일 복구
+          if (nextButton.dataset.originalBackground) {
+            // 부드러운 전환으로 원래 색상으로 복구
+            nextButton.style.transition = 'background 0.5s ease-out';
+            nextButton.style.background = nextButton.dataset.originalBackground;
+            console.log(`⏰ [DEBUG] 부드러운 배경색 복구: ${nextButton.dataset.originalBackground}`);
+          } else {
+            // 기본 스타일로만 초기화
+            nextButton.style.background = '';
+          }
+          
+          // 프로그레스 관련 스타일 정리 (지연 실행으로 부드러운 효과)
+          setTimeout(() => {
+            nextButton.style.backgroundSize = '';
+            nextButton.style.backgroundRepeat = '';
+            nextButton.style.transition = '';
+          }, 500);
+          
+          console.log(`⏰ [DEBUG] 버튼 스타일 부드럽게 복구: ${nextButton.textContent}`);
+        }
+        
+        console.log(`⏰ [AUTO] 자동 진행 시스템 정리 완료`);
+      }
+
+      function getCurrentPageName() {
+        return window.app?.getCurrentScreen?.() || 'home';
+      }
+
+      // 간단한 page3 음성 테스트 함수
+      function testPage3Voice() {
+        console.log('🧪 [TEST] page3 음성 테스트 시작');
+        
+        // 직접 오디오 객체 생성하여 테스트
+        const testAudio = new Audio('assets/voices/voice_page3.mp3');
+        testAudio.volume = 0.8;
+        
+        testAudio.addEventListener('loadeddata', () => {
+          console.log('🧪 [TEST] 음성 파일 로드 성공');
+        });
+        
+        testAudio.addEventListener('error', (e) => {
+          console.error('🧪 [TEST] 음성 파일 로드 실패:', e);
+          console.error('🧪 [TEST] 파일 경로:', testAudio.src);
+        });
+        
+        testAudio.play().then(() => {
+          console.log('🧪 [TEST] ✅ 음성 재생 성공!');
+        }).catch(error => {
+          console.error('🧪 [TEST] ❌ 음성 재생 실패:', error);
+        });
+        
+        // 전역에서 접근 가능하도록
+        window.testAudio = testAudio;
+      }
+
+      // 페이지별 음성 가이드 재생 (수정된 버전)
+      function playVoiceForPage(pageName) {
+        console.log(`🎙️ [DEBUG] playVoiceForPage 호출됨: ${pageName}`);
+        console.log(`🎙️ [DEBUG] userHasInteracted: ${userHasInteracted}`);
+        console.log(`🎙️ [DEBUG] isVoiceEnabled: ${isVoiceEnabled}`);
+        console.log(`🎙️ [DEBUG] VOICE_SCRIPTS[${pageName}]: ${VOICE_SCRIPTS[pageName]}`);
+        console.log(`🎙️ [DEBUG] voiceAudio 객체: ${!!voiceAudio}`);
+        
+        // 사용자 상호작용 체크를 일시적으로 비활성화 (테스트용)
+        console.log(`🎙️ [INFO] 사용자 상호작용 체크 건너뛰기 (테스트 모드)`);
+        
+        if (!isVoiceEnabled) {
+          console.log(`🎙️ 음성 가이드 비활성화됨`);
+          return;
+        }
+        
+        if (!VOICE_SCRIPTS[pageName]) {
+          console.log(`🎙️ 음성 가이드 없음: ${pageName}`);
+          return;
+        }
+
+        if (!voiceAudio) {
+          console.error(`🎙️ [ERROR] voiceAudio 객체가 초기화되지 않음`);
+          return;
+        }
+
+        const voiceFile = VOICE_SCRIPTS[pageName];
+        console.log(`🎙️ [DEBUG] 음성 파일 경로: ${voiceFile}`);
+        
+        // 이전 음성 정지
+        if (isVoicePlaying) {
+          console.log(`🎙️ [DEBUG] 이전 음성 정지`);
+          stopVoice();
+        }
+
+        // 배경음악 볼륨 줄이기
+        lowerBackgroundMusicVolume();
+
+        // 음성 파일 로드 및 재생
+        voiceAudio.src = voiceFile;
+        console.log(`🎙️ [DEBUG] 음성 파일 src 설정 완료: ${voiceAudio.src}`);
+        
+        // 약간의 지연 후 재생 시도
+        setTimeout(() => {
+          voiceAudio.play().then(() => {
+            isVoicePlaying = true;
+            console.log(`🎙️ ✅ 음성 가이드 재생 시작: ${pageName}`);
+          }).catch(error => {
+            console.error(`🎙️ ❌ 음성 가이드 재생 실패: ${pageName}`, error);
+            console.error(`🎙️ [ERROR] 파일 경로: ${voiceFile}`);
+            console.error(`🎙️ [ERROR] 상세 오류:`, error.message);
+            restoreBackgroundMusicVolume();
+          });
+        }, 100);
+      }
+
+      // 음성 가이드 정지
+      function stopVoice() {
+        if (voiceAudio) {
+          voiceAudio.pause();
+          voiceAudio.currentTime = 0;
+          isVoicePlaying = false;
+          restoreBackgroundMusicVolume();
+          console.log('🎙️ 음성 가이드 정지');
+        }
+      }
+
+      // 음성 가이드 토글
+      function toggleVoiceGuide() {
+        isVoiceEnabled = !isVoiceEnabled;
+        if (!isVoiceEnabled && isVoicePlaying) {
+          stopVoice();
+        }
+        console.log(`🎙️ 음성 가이드 ${isVoiceEnabled ? '활성화' : '비활성화'}`);
+        return isVoiceEnabled;
+      }
+
+      // 배경음악 볼륨 줄이기 (음성 재생 중)
+      function lowerBackgroundMusicVolume() {
+        if (backgroundAudio && isMusicEnabled) {
+          backgroundAudio.volume = 0.3; // 30%로 줄임
+          console.log('🔉 배경음악 볼륨 감소 (음성 재생 중)');
+        }
+      }
+
+      // 배경음악 볼륨 복구
+      function restoreBackgroundMusicVolume() {
+        if (backgroundAudio && isMusicEnabled) {
+          backgroundAudio.volume = 1.0; // 원래 볼륨으로 복구
+          console.log('🔊 배경음악 볼륨 복구');
+        }
+      }
+
+      // 배경 음악 토글 함수 (전역에서 사용 가능)
+      function toggleBackgroundMusic() {
+        if (isMusicEnabled) {
+          // 음악 끄기
+          backgroundAudio.pause();
+          isMusicEnabled = false;
+          console.log('🔇 배경 음악 비활성화');
+        } else {
+          // 음악 켜기
+          isMusicEnabled = true;
+          backgroundAudio.play().then(() => {
+            console.log('🎵 배경 음악 활성화');
+          }).catch(error => {
+            console.warn('배경 음악 재생 실패:', error);
+          });
+        }
+        return isMusicEnabled;
+      }
+
+      // 홈 동영상 상태와 배경 음악 동기화
+      function syncMusicWithHomeVideo() {
+        const homeVideo = document.getElementById('homeBackgroundVideo');
+        if (homeVideo) {
+          // 홈 동영상이 음소거되어 있으면 배경 음악도 끄기
+          if (homeVideo.muted) {
+            if (isMusicEnabled) {
+              backgroundAudio.pause();
+              isMusicEnabled = false;
+              console.log('🔇 홈 동영상 음소거에 따라 배경 음악 비활성화');
+            }
+          } else {
+            // 홈 동영상 소리가 켜져 있으면 배경 음악도 켜기
+            if (!isMusicEnabled) {
+              isMusicEnabled = true;
+              backgroundAudio.play().then(() => {
+                console.log('🔊 홈 동영상 재생에 따라 배경 음악 활성화');
+              }).catch(error => {
+                console.warn('배경 음악 재생 실패:', error);
+              });
+            }
+          }
+        }
+        return isMusicEnabled;
+      }
+
+      // 사용자 상호작용 후 자동 음악 시작
+      function startBackgroundMusicOnInteraction() {
+        // 홈 화면에서는 홈 동영상 상태에 따라 결정
+        const currentScreen = window.app?.getCurrentScreen?.() || 'home';
+        
+        if (currentScreen === 'home') {
+          syncMusicWithHomeVideo();
+        } else {
+          // 다른 페이지에서는 현재 음악 활성화 상태에 따라
+          if (isMusicEnabled) {
+            backgroundAudio.play().then(() => {
+              console.log('🎵 배경 음악 자동 시작');
+            }).catch(error => {
+              console.warn('배경 음악 시작 실패:', error);
+            });
+          }
+        }
+      }
+
+      // 홈 화면 동영상 오디오 음소거 함수
+      function muteHomeVideo() {
+        setTimeout(() => {
+          const homeVideo = document.getElementById('homeBackgroundVideo');
+          if (homeVideo) {
+            homeVideo.muted = true; // 홈 동영상 음소거
+            homeVideo.volume = 0;
+            console.log('🔇 홈 화면 동영상 오디오 음소거');
+            
+            // 배경 음악도 함께 비활성화
+            syncMusicWithHomeVideo();
+          }
+        }, 1000);
+      }
+
+      // 페이지 로드 완료 후 자동 초기화 및 재생
+      window.addEventListener('load', () => {
+        initBackgroundMusic();
+        initVoiceGuide(); // 음성 가이드 시스템 초기화
+        muteHomeVideo(); // 홈 동영상 음소거
+        
+        // 사용자 상호작용 감지 (버튼 클릭, 터치, 키보드 등)
+        const interactionEvents = ['click', 'touchstart', 'keydown'];
+        
+        function markUserInteraction() {
+          if (!userHasInteracted) {
+            userHasInteracted = true;
+            console.log('👆 사용자 상호작용 감지됨 - 음성 재생 가능');
+          }
+        }
+        
+        // 상호작용 이벤트 리스너 등록
+        interactionEvents.forEach(event => {
+          document.addEventListener(event, markUserInteraction, { once: true });
+        });
+        
+        // 첫 번째 클릭이나 터치에서 음악 자동 시작
+        document.addEventListener('click', startBackgroundMusicOnInteraction, { once: true });
+        document.addEventListener('touchstart', startBackgroundMusicOnInteraction, { once: true });
+      });
+      
+      // 5초 후 동영상 상태 확인
+      setTimeout(() => {
+        const video = document.getElementById('homeBackgroundVideo');
+        console.log('🎬 동영상 요소:', video);
+        if (video) {
+          console.log('🎬 동영상 src:', video.src);
+          console.log('🎬 동영상 readyState:', video.readyState);
+          console.log('🎬 동영상 networkState:', video.networkState);
+        }
+        
+        const videoContainer = document.querySelector('.home-video-container');
+        console.log('🎬 동영상 컨테이너:', videoContainer);
+        
+        // 배경 음악 상태 확인
+        console.log('🎵 배경 음악 상태:', {
+          currentTrack: currentAudioIndex,
+          volume: backgroundAudio?.volume,
+          src: backgroundAudio?.src
+        });
+      }, 5000);
+    </script>
+  </body>
+</html>
