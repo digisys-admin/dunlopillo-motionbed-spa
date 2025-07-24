@@ -18,6 +18,19 @@
 
 /* ==== OPTIMIZED RESET - 최적화된 리셋 ==== */
 /* Meyer Reset CSS를 인라인으로 최적화하여 HTTP 요청 제거 */
+
+/* HTML, Body 기본 스타일 강화 (Fullscreen 최적화) */
+html {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -47,6 +60,11 @@ footer, header, hgroup, menu, nav, section {
 
 body {
   line-height: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 ol, ul {
@@ -1404,6 +1422,82 @@ body {
   }
 }
 
+/* ==== 전체화면 및 사운드 버튼 스타일 ==== */
+#fullscreenToggle,
+#soundToggle {
+  position: fixed;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#fullscreenToggle {
+  top: 20px;
+  left: 20px;
+}
+
+#soundToggle {
+  top: 20px;
+  right: 20px;
+}
+
+#fullscreenToggle:hover,
+#soundToggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 태블릿에서 버튼 크기 조정 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  #fullscreenToggle,
+  #soundToggle {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.8rem !important;
+    top: 20px !important;
+  }
+  
+  #fullscreenToggle {
+    left: 20px !important;
+  }
+  
+  #soundToggle {
+    right: 20px !important;
+  }
+}
+
+/* 모바일에서 버튼 크기 조정 */
+@media (max-width: 767px) {
+  #fullscreenToggle,
+  #soundToggle {
+    width: 45px !important;
+    height: 45px !important;
+    font-size: 1.6rem !important;
+    top: 15px !important;
+  }
+  
+  #fullscreenToggle {
+    left: 15px !important;
+  }
+  
+  #soundToggle {
+    right: 15px !important;
+  }
+}
+
 /* ==== PAGE3 - 라텍스 매트리스 & 모션베드 체험 시작 페이지 ==== */
 .page3-element {
   position: relative;
@@ -1821,10 +1915,10 @@ body {
 
 .page6-content-wrapper {
   position: absolute;
-  width: 703px;
-  height: 200px;
-  top: 341px;
-  left: 289px;
+  width: 703px; /* 기존 사이즈 유지 */
+  height: 220px; /* 기존 200px에서 20px 증가 - page9 텍스트 겹침 방지 */
+  top: 341px; /* 기존 위치 유지 */
+  left: 289px; /* 기존 위치 유지 */
   background-color: var(--light-gray);
   border-radius: 15px;
   box-shadow: 2px 3px 6px 2px #00000040;
@@ -1832,45 +1926,60 @@ body {
 
 .page6-content-group {
   position: relative;
-  width: 635px;
-  height: 160px;
-  top: 20px;
-  left: 34px;
+  width: 635px; /* 기존 사이즈 유지 */
+  height: 180px; /* 기존 160px에서 20px 증가 - page9 텍스트 겹침 방지 */
+  top: 20px; /* 기존 위치 유지 */
+  left: 34px; /* 기존 위치 유지 */
+  text-align: left; /* 전체 그룹 왼쪽 정렬 */
 }
 
 .page6-text-1 {
   position: absolute;
-  height: 62px;
+  height: 85px; /* 기존 62px에서 23px 증가 - 더 많은 텍스트 수용 */
   top: 0;
   left: 0;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 20px;
-  letter-spacing: -2.00px;
-  line-height: 30.6px;
+  font-size: 20px; /* 기존 폰트 크기 유지 */
+  letter-spacing: -2.00px; /* 기존 자간 유지 */
+  line-height: 30.6px; /* 기존 줄간격 유지 */
   margin: 0;
+  padding: 0; /* 패딩 제거 */
+  width: 100%; /* 전체 너비 사용 */
+  overflow: visible; /* 오버플로우 허용으로 변경 */
+  white-space: normal; /* 줄바꿈 허용으로 변경 */
+  text-align: left !important; /* 강제 왼쪽 정렬 */
+  text-indent: 0 !important; /* 들여쓰기 제거 */
+  direction: ltr; /* 왼쪽에서 오른쪽 방향 명시 */
 }
 
 .page6-text-2 {
   position: absolute;
-  height: 62px;
-  top: 85px;
+  height: 62px; /* 기존 높이 유지 */
+  top: 95px; /* 기존 85px에서 10px 더 아래로 - 겹침 방지 */
   left: 0;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 20px;
-  letter-spacing: -2.00px;
-  line-height: 30.6px;
+  font-size: 20px; /* 기존 폰트 크기 유지 */
+  letter-spacing: -2.00px; /* 기존 자간 유지 */
+  line-height: 30.6px; /* 기존 줄간격 유지 */
   margin: 0;
+  padding: 0; /* 패딩 제거 */
+  width: 100%; /* 전체 너비 사용 */
+  overflow: visible; /* 오버플로우 허용 */
+  white-space: normal; /* 줄바꿈 허용 */
+  text-align: left !important; /* 강제 왼쪽 정렬 */
+  text-indent: 0 !important; /* 들여쓰기 제거 */
+  direction: ltr; /* 왼쪽에서 오른쪽 방향 명시 */
 }
 
 .page6-tip-label {
   position: absolute;
   height: 44px;
-  top: 277px;
-  left: 604px;
+  top: 277px; /* 기존 위치 유지 */
+  left: 604px; /* 기존 위치 유지 */
   font-family: var(--font-bold);
   font-weight: 700;
   color: var(--primary-blue);
@@ -1878,6 +1987,114 @@ body {
   letter-spacing: 0;
   line-height: 44.2px;
   white-space: nowrap;
+}
+
+/* ==== 테블릿 전용 반응형 TIP 페이지 ==== */
+@media screen and (max-width: 1024px) {
+  .page6-content-wrapper {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 80% !important;
+    max-width: 600px !important;
+    height: 240px !important; /* 모바일에서도 높이 증가 */
+  }
+  
+  .page6-tip-label {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+  
+  .page6-content-group {
+    left: 20px !important;
+    width: calc(100% - 40px) !important;
+    text-align: left !important;
+    height: 200px !important; /* 모바일에서도 높이 증가 */
+  }
+  
+  .page6-text-1,
+  .page6-text-2 {
+    text-align: left !important;
+    text-indent: 0 !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    direction: ltr !important;
+    word-break: keep-all !important;
+    word-wrap: break-word !important;
+    letter-spacing: -1.5px !important; /* 자간 조정 */
+    line-height: 28px !important; /* 줄간격 약간 줄임 */
+    width: 100% !important;
+    left: 0 !important;
+    position: absolute !important;
+    writing-mode: horizontal-tb !important; /* 수평 쓰기 모드 강제 */
+    unicode-bidi: bidi-override !important; /* 텍스트 방향 강제 */
+    text-orientation: mixed !important; /* 텍스트 방향 강제 */
+    display: block !important;
+    float: none !important;
+    transform: none !important;
+  }
+  
+  /* page9 전용 레이아웃 조정 (page6과 동일한 구조 적용) */
+  .page9 .page6-content-wrapper {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 80% !important;
+    max-width: 600px !important;
+    height: 280px !important; /* page9는 텍스트가 더 길어서 높이 더 증가 */
+  }
+  
+  .page9 .page6-tip-label {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+  
+  .page9 .page6-content-group {
+    left: 20px !important;
+    width: calc(100% - 40px) !important;
+    text-align: left !important;
+    height: 240px !important; /* page9는 텍스트가 더 길어서 높이 더 증가 */
+  }
+  
+  .page9 .page6-text-1,
+  .page9 .page6-text-2 {
+    text-align: left !important;
+    text-indent: 0 !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    direction: ltr !important;
+    word-break: keep-all !important;
+    word-wrap: break-word !important;
+    letter-spacing: -1.5px !important; /* 자간 조정 */
+    line-height: 26px !important; /* page9는 줄간격 약간 더 줄임 */
+    width: 100% !important;
+    left: 0 !important;
+    position: absolute !important;
+    writing-mode: horizontal-tb !important; /* 수평 쓰기 모드 강제 */
+    unicode-bidi: bidi-override !important; /* 텍스트 방향 강제 */
+    text-orientation: mixed !important; /* 텍스트 방향 강제 */
+    display: block !important;
+    float: none !important;
+    transform: none !important;
+    font-size: 17px !important; /* page9는 글자 크기 약간 더 작게 */
+  }
+  
+  /* page9에서 절대 위치 요소들 조정 (bottom, right 속성 가진 요소들) */
+  .page9 [style*="position: absolute"][style*="bottom:"],
+  .page9 [style*="position: absolute"][style*="right:"] {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* 더 구체적인 셀렉터로 강제 적용 */
+  .page6-element .page6-content-wrapper .page6-content-group .page6-text-1,
+  .page6-element .page6-content-wrapper .page6-content-group .page6-text-2 {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    text-justify: none !important;
+  }
 }
 
 .page6-version {
@@ -2139,3 +2356,324 @@ body {
       rgba(76, 175, 80, 0.2) 100%);
   }
 }
+
+/* ==== 완전한 전체화면 모드 스타일 ==== */
+/* 브라우저 상단 흰색 여백 완전 제거 */
+html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #2d3748 !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+:fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #2d3748 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+:fullscreen body, :-webkit-full-screen body, :-moz-full-screen body, :-ms-fullscreen body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: #2d3748 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+:fullscreen .screen-container, :-webkit-full-screen .screen-container, :-moz-full-screen .screen-container, :-ms-fullscreen .screen-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  background: #2d3748 !important;
+  border: none !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+}
+
+/* 🎯 테블릿 전체화면 특별 최적화 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #2d3748 !important;
+    /* 테블릿에서 안전 영역 무시 */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  :fullscreen body, :-webkit-full-screen body, :-moz-full-screen body, :-ms-fullscreen body {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #2d3748 !important;
+  }
+  
+  :fullscreen .screen-container, :-webkit-full-screen .screen-container, :-moz-full-screen .screen-container, :-ms-fullscreen .screen-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    outline: none !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #f5f5f5 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* 웹킷 기반 브라우저 (Chrome, Safari) */
+:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:-webkit-full-screen body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #2d3748 !important;
+}
+
+:-webkit-full-screen .screen-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Firefox */
+:-moz-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:-moz-full-screen body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #2d3748 !important;
+}
+
+:-moz-full-screen .screen-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* MS Edge/IE */
+:-ms-fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:-ms-fullscreen body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #2d3748 !important;
+}
+
+:-ms-fullscreen .screen-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* ==== 태블릿 전체화면/볼륨 버튼 최적화 ==== */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  /* 메인 컨테이너 스케일링 */
+  .screen-container {
+    transform: scale(0.8) !important;
+    transform-origin: center center !important;
+    overflow: hidden !important;
+  }
+  
+  #soundToggle, #fullscreenToggle {
+    position: fixed !important;
+    z-index: 99999 !important;
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.8rem !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  #soundToggle {
+    top: 20px !important;
+    right: 20px !important;
+  }
+  
+  #fullscreenToggle {
+    top: 20px !important;
+    left: 20px !important;
+  }
+  
+  #soundToggle:hover, #fullscreenToggle:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.05) !important;
+  }
+}
+
+/* ==== 안전한 전체화면 모드 ==== */
+/* 맥북 크롬 호환성을 위한 부드러운 전체화면 처리 */
+:fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
+  /* 기본 여백 제거 */
+  margin: 0;
+  padding: 0;
+  
+  /* 전체화면 점유 */
+  width: 100vw;
+  height: 100vh;
+  
+  /* 오버플로우 처리 */
+  overflow: hidden;
+  
+  /* 배경색 */
+  background: #2d3748;
+}
+
+/* 전체화면 모드 클래스 기반 스타일 */
+body.fullscreen-mode {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.fullscreen-mode .screen-container {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ==== 모바일 전체화면/볼륨 버튼 최적화 ==== */
+@media screen and (max-width: 767px) {
+  #soundToggle, #fullscreenToggle {
+    position: fixed !important;
+    z-index: 99999 !important;
+    width: 45px !important;
+    height: 45px !important;
+    font-size: 1.6rem !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  #soundToggle {
+    top: 15px !important;
+    right: 15px !important;
+  }
+  
+  #fullscreenToggle {
+    top: 15px !important;
+    left: 15px !important;
+  }
+}
+
+/* ==== 📱 전체화면 최적화 스타일 ==== */
+/* 기본 전체화면 스타일만 유지 */

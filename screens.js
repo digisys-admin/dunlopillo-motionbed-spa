@@ -894,16 +894,15 @@ const screens = {
         ${COMMON_ELEMENTS.getProgressBar('page6')}
         
         <div class="page6-content-wrapper">
-          <div class="page6-content-group" style="display: flex; align-items: center; justify-content: center; height: 100%; padding: 60px 20px 30px 20px;">
-            <div style="text-align: left;">
-              <p class="page6-text-1">
-                연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.<br /><span style="white-space: nowrap;">이렇게 다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.</span>
-              </p>
-              <br />
-              <p class="page6-text-2">
-                이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면<br />부종이 완화되거나 허리/어깨가 편해지는 것을 느끼실 수 있습니다.
-              </p>
-            </div>
+          <div class="page6-content-group">
+            <p class="page6-text-1">
+              연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.<br />
+              다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.
+            </p>
+            <p class="page6-text-2">
+              이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면<br />
+              부종이 완화되거나 허리/어깨가 편해지는 것을 느끼실 수 있습니다.
+            </p>
           </div>
         </div>
         
@@ -1002,7 +1001,7 @@ const screens = {
     content: `
       ${COMMON_ELEMENTS.getButtons('page9')}
       
-      <div class="page6-element" style="background-image: url(${IMG.P9_PIC1}); background-size: cover; background-position: 50% 50%;">
+      <div class="page6-element page9" style="background-image: url(${IMG.P9_PIC1}); background-size: cover; background-position: 50% 50%;">
         <img class="page6-version" src="${IMG.LOGO}" onerror="this.src='${LOCAL_IMAGES.LOGO}'" />
         
         <p class="page6-title">라텍스 매트리스 &amp; 모션베드 체험</p>
@@ -1012,11 +1011,12 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              실제로 많은 분들이 주무실 때, 코가 조금 막히거나 코콜이를 심하게 하시는 경우가 있는데요.<br />이 때 모션베드를 통해 머리를 조금 올려 기도를 확보하면 숨쉬기 편해지고 코콜이나 무호흡증<br />또한 완화될 수 있습니다.
+              <span style="white-space: nowrap;">실제로 많은 분들이 주무실 때, 코가 조금 막히거나 코골이를 심하게 하시는 경우가 있는데요.</span><br />
+              이 때 모션베드를 통해 머리를 조금 올려 기도를 확보하면 숨쉬기 편해지고<br />
+              코골이나 무호흡증 또한 완화될 수 있습니다.
             </p>
-            <br  />
             <p class="page6-text-2">
-            <br  />
+            <br />
               또한 역류성 식도염도 완화되는 효과를 보실 수 있습니다.
             </p>
           </div>
@@ -1180,12 +1180,14 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              이 자세는 영어로 Perfect Recovery Posture 라고도 하는데요.<br />이는 '가장 완벽한 회복자세'라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서<br />수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현해낸 자세입니다.
+              이 자세는 영어로 Perfect Recovery Posture 라고도 하는데요.<br />
+              이는 '가장 완벽한 회복자세'라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서<br />
+              <span style="white-space: nowrap;">수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현해낸 자세입니다.</span><br />
             </p>
-            <br  />
             <p class="page6-text-2">
-            <br  />
-              완벽한 상하체 각도를 통해 마치 무중력에 있는 듯한 느낌을 받을 수 있으며, 신체 압력 완화,<br />혈액순환 향상, 호흡 안정화 등의 효과를 느낄 수 있습니다.
+            <br />
+              완벽한 상하체 각도를 통해 마치 무중력에 있는 듯한 느낌을 받을 수 있으며,<br />
+              신체 압력 완화, 혈액순환 향상, 호흡 안정화 등의 효과를 느낄 수 있습니다.
             </p>
           </div>
         </div>
@@ -1240,10 +1242,12 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              혹시 어딘지 모르게 불편하지는 않으신가요?<br />그건 바로 지금까지 모션베드를 체험하면서 몸이 편안한 상태에 적응되었기 때문입니다.
+              혹시 어딘지 모르게 불편하지는 않으신가요?<br />
+              그건 바로 지금까지 모션베드를 체험하면서 몸이 편안한 상태에 적응되었기 때문입니다.
             </p>
             <p class="page6-text-2">
-              던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽히 호환되기에<br />더욱 안정감 있고 편안한 휴식 및 숙면을 취하는 데 도움이 될 거라고 확신합니다.
+              던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽히 호환되기에<br />
+              더욱 안정감 있고 편안한 휴식 및 숙면을 취하는 데 도움이 될 거라고 확신합니다.
             </p>
           </div>
         </div>

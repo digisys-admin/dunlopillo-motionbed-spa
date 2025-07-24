@@ -1,8 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, minimal-ui" />
     <meta charset="utf-8" />
+    
+    <!-- 모바일 최적화 메타 태그 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- PWA 매니페스트 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+    <meta name="apple-mobile-web-app-title" content="던롭필로 SPA">
+    
     <!-- 폰트 최적화: font-display 적용 및 CDN 폰트 직접 로딩 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -39,6 +54,108 @@
       // 동영상 디버깅
       console.log('🎬 VIDEO_SOURCES 확인:', window.VIDEO_SOURCES);
       console.log('🎬 USE_VIDEO_BACKGROUND 확인:', window.USE_VIDEO_BACKGROUND);
+      
+      // 🖥️ 전체화면 함수들을 가장 먼저 정의 (전역 접근 가능)
+      function toggleFullscreen() {
+        console.log('🖥️ 전체화면 토글 함수 호출됨!');
+        
+        const elem = document.documentElement;
+        
+        // 현재 전체화면 상태 확인
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        console.log('🖥️ 현재 전체화면 상태:', isFullscreen);
+        
+        if (isFullscreen) {
+          // 전체화면 해제 (안전하게)
+          console.log('🖥️ 전체화면 해제 시도');
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(err => {
+              console.warn('🖥️ 전체화면 해제 실패:', err);
+            });
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        } else {
+          // 전체화면 진입 (안전하게)
+          console.log('🖥️ 전체화면 진입 시도');
+          
+          // 맥북 크롬 호환을 위한 안전한 요청
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => {
+              console.warn('🖥️ 전체화면 진입 실패:', err);
+              // navigationUI 옵션 없이 재시도
+              elem.requestFullscreen().catch(err2 => {
+                console.error('🖥️ 전체화면 진입 완전 실패:', err2);
+              });
+            });
+          } else if (elem.webkitRequestFullscreen) {
+            // Safari/Chrome 구형 버전 지원
+            elem.webkitRequestFullscreen();
+          }
+        }
+      }
+      
+      // 전역으로 등록
+      window.toggleFullscreen = toggleFullscreen;
+      
+      window.updateFullscreenButton = function(isFullscreen) {
+        console.log('🖥️ 버튼 업데이트:', isFullscreen ? '전체화면 모드' : '일반 모드');
+        
+        const fullscreenBtn = document.getElementById('fullscreenToggle');
+        if (!fullscreenBtn) {
+          console.warn('🖥️ ⚠️ 전체화면 버튼을 찾을 수 없습니다');
+          return;
+        }
+        
+        try {
+          if (isFullscreen) {
+            fullscreenBtn.innerHTML = `
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 16H8V14H5V16ZM8 8H5V10H8V8ZM14 19H16V16H14V19ZM16 8V5H14V8H16ZM14 14H16V16H14V14ZM8 10H10V8H8V10ZM10 14V16H8V14H10ZM16 10H14V8H16V10Z" fill="currentColor"/>
+              </svg>
+            `;
+            fullscreenBtn.title = '전체화면 해제';
+          } else {
+            fullscreenBtn.innerHTML = `
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor"/>
+                <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor"/>
+                <path d="M17 14H19V19H14V17H17V14Z" fill="currentColor"/>
+                <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor"/>
+              </svg>
+            `;
+            fullscreenBtn.title = '전체화면 모드';
+          }
+          console.log('🖥️ ✅ 버튼 아이콘 업데이트 완료');
+        } catch (error) {
+          console.error('🖥️ ❌ 버튼 업데이트 실패:', error);
+        }
+      };
+      
+      // 전체화면 상태 변경 감지
+      window.handleFullscreenChange = function() {
+        const isFullscreen = !!(document.fullscreenElement || 
+                               document.webkitFullscreenElement || 
+                               document.mozFullScreenElement || 
+                               document.msFullscreenElement);
+        
+        console.log(`🖥️ 전체화면 상태 변경 이벤트: ${isFullscreen ? '활성화' : '해제'}`);
+        window.updateFullscreenButton(isFullscreen);
+        
+        if (isFullscreen) {
+          document.body.classList.add('fullscreen-mode');
+        } else {
+          document.body.classList.remove('fullscreen-mode');
+        }
+      };
+      
+      // 전체화면 이벤트 리스너 등록
+      document.addEventListener('fullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('mozfullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('MSFullscreenChange', window.handleFullscreenChange);
+      
+      console.log('🖥️ 전체화면 함수들이 전역으로 정의되었습니다');
       
       // 🎵 배경 음악 자동 재생 시스템
       let backgroundAudio = null;
@@ -511,15 +628,27 @@
       function syncMusicWithHomeVideo() {
         const homeVideo = document.getElementById('homeBackgroundVideo');
         if (homeVideo) {
-          // 홈 동영상이 음소거되어 있으면 배경 음악도 끄기
+          console.log(`🔇 홈 동영상 음소거 상태: ${homeVideo.muted}`);
+          
+          // 홈 동영상이 음소거되어 있으면 배경 음악과 음성 가이드도 끄기
           if (homeVideo.muted) {
+            // 배경 음악 비활성화
             if (isMusicEnabled) {
               backgroundAudio.pause();
               isMusicEnabled = false;
               console.log('🔇 홈 동영상 음소거에 따라 배경 음악 비활성화');
             }
+            
+            // 음성 가이드도 비활성화
+            if (isVoiceEnabled) {
+              isVoiceEnabled = false;
+              if (isVoicePlaying) {
+                stopVoice();
+              }
+              console.log('🔇 홈 동영상 음소거에 따라 음성 가이드 비활성화');
+            }
           } else {
-            // 홈 동영상 소리가 켜져 있으면 배경 음악도 켜기
+            // 홈 동영상 소리가 켜져 있으면 배경 음악과 음성 가이드도 켜기
             if (!isMusicEnabled) {
               isMusicEnabled = true;
               backgroundAudio.play().then(() => {
@@ -527,6 +656,12 @@
               }).catch(error => {
                 console.warn('배경 음악 재생 실패:', error);
               });
+            }
+            
+            // 음성 가이드도 활성화
+            if (!isVoiceEnabled) {
+              isVoiceEnabled = true;
+              console.log('🔊 홈 동영상 재생에 따라 음성 가이드 활성화');
             }
           }
         }
@@ -567,31 +702,214 @@
         }, 1000);
       }
 
+      window.updateFullscreenButton = function(isFullscreen) {
+        const fullscreenBtn = document.getElementById('fullscreenToggle');
+        if (!fullscreenBtn) return;
+        
+        if (isFullscreen) {
+          fullscreenBtn.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 16H8V14H5V16ZM8 8H5V10H8V8ZM14 19H16V16H14V19ZM16 8V5H14V8H16ZM14 14H16V16H14V14ZM8 10H10V8H8V10ZM10 14V16H8V14H10ZM16 10H14V8H16V10Z" fill="currentColor"/>
+            </svg>
+          `;
+          fullscreenBtn.title = '전체화면 해제';
+        } else {
+          fullscreenBtn.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor"/>
+              <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor"/>
+              <path d="M17 14H19V19H14V17H17V14Z" fill="currentColor"/>
+              <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor"/>
+            </svg>
+          `;
+          fullscreenBtn.title = '전체화면 모드';
+        }
+      };
+
+      // 전체화면 상태 변경 감지
+      window.handleFullscreenChange = function() {
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        window.updateFullscreenButton(isFullscreen);
+        
+        if (isFullscreen) {
+          document.body.classList.add('fullscreen-mode');
+        } else {
+          document.body.classList.remove('fullscreen-mode');
+        }
+      };
+
+      // 전체화면 이벤트 리스너 등록
+      document.addEventListener('fullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('mozfullscreenchange', window.handleFullscreenChange);
+      document.addEventListener('MSFullscreenChange', window.handleFullscreenChange);
+
+      // 페이지 로드 완료 후 추가 설정 (fullscreen-test.html 방식)
+      window.addEventListener('load', function() {
+        console.log('🖥️ 페이지 로드 완료 - 전체화면 함수 확인');
+        console.log('🖥️ window.toggleFullscreen:', typeof window.toggleFullscreen);
+        
+        // 전체화면 지원 확인
+        const elem = document.documentElement;
+        const support = elem.requestFullscreen ? 'Standard API ✅' :
+                       elem.webkitRequestFullscreen ? 'WebKit API ✅' :
+                       elem.mozRequestFullScreen ? 'Mozilla API ✅' :
+                       elem.msRequestFullscreen ? 'MS API ✅' : 'Not Supported ❌';
+        console.log('🖥️ 전체화면 지원:', support);
+      });
+      
+      // 전체화면 기능 테스트 함수
+      window.testFullscreen = function() {
+        console.log('🖥️ 전체화면 기능 테스트 시작');
+        console.log('🖥️ 브라우저 지원 여부:', {
+          requestFullscreen: !!document.documentElement.requestFullscreen,
+          webkitRequestFullscreen: !!document.documentElement.webkitRequestFullscreen,
+          mozRequestFullScreen: !!document.documentElement.mozRequestFullScreen,
+          msRequestFullscreen: !!document.documentElement.msRequestFullscreen
+        });
+        
+        const fullscreenBtn = document.getElementById('fullscreenToggle');
+        console.log('🖥️ 전체화면 버튼 존재:', !!fullscreenBtn);
+        
+        if (fullscreenBtn) {
+          console.log('🖥️ 버튼 클릭 이벤트 수동 발생');
+          fullscreenBtn.click();
+        }
+      };
+
       // 페이지 로드 완료 후 자동 초기화 및 재생
       window.addEventListener('load', () => {
+        console.log('🎬 페이지 로드 완료 - 시스템 초기화 시작');
+        
         initBackgroundMusic();
         initVoiceGuide(); // 음성 가이드 시스템 초기화
         muteHomeVideo(); // 홈 동영상 음소거
         
-        // 사용자 상호작용 감지 (버튼 클릭, 터치, 키보드 등)
-        const interactionEvents = ['click', 'touchstart', 'keydown'];
+        // 전체화면 버튼 초기 상태 설정
+        updateFullscreenButton(false);
         
-        function markUserInteraction() {
-          if (!userHasInteracted) {
-            userHasInteracted = true;
-            console.log('👆 사용자 상호작용 감지됨 - 음성 재생 가능');
+        // 🖥️ 키오스크 모드: 기본 전체화면 설정
+        initKioskMode();
+        
+        // 🖥️ 전체화면 버튼 확인 (홈 화면 로드 후)
+        setTimeout(() => {
+          const fullscreenBtn = document.getElementById('fullscreenToggle');
+          console.log('🖥️ 전체화면 버튼 존재 여부:', !!fullscreenBtn);
+          console.log('🖥️ window.toggleFullscreen 함수:', typeof window.toggleFullscreen);
+          
+          if (fullscreenBtn) {
+            console.log('🖥️ 전체화면 버튼 onclick 속성:', fullscreenBtn.getAttribute('onclick'));
+            
+            // 수동으로 클릭 이벤트 리스너 추가
+            fullscreenBtn.addEventListener('click', function(e) {
+              console.log('🖥️ 버튼 클릭 이벤트 감지됨!');
+              e.preventDefault();
+              if (typeof window.toggleFullscreen === 'function') {
+                window.toggleFullscreen();
+              } else {
+                console.error('🖥️ toggleFullscreen 함수를 찾을 수 없음');
+              }
+            });
+            console.log('🖥️ ✅ 전체화면 버튼에 이벤트 리스너 추가 완료');
+          } else {
+            console.error('🖥️ ❌ 전체화면 버튼을 찾을 수 없음');
           }
-        }
-        
-        // 상호작용 이벤트 리스너 등록
-        interactionEvents.forEach(event => {
-          document.addEventListener(event, markUserInteraction, { once: true });
-        });
-        
-        // 첫 번째 클릭이나 터치에서 음악 자동 시작
+        }, 2000); // 홈 화면 로드 후 2초 대기            // 사용자 상호작용 감지 (버튼 클릭, 터치, 키보드 등)
+            const interactionEvents = ['click', 'touchstart', 'keydown'];
+            
+            function markUserInteraction() {
+              if (!userHasInteracted) {
+                userHasInteracted = true;
+                console.log('👆 사용자 상호작용 감지됨 - 음성 재생 가능');
+              }
+            }
+            
+            // 상호작용 이벤트 리스너 등록
+            interactionEvents.forEach(event => {
+              document.addEventListener(event, markUserInteraction, { once: true });
+            });        // 첫 번째 클릭이나 터치에서 음악 자동 시작
         document.addEventListener('click', startBackgroundMusicOnInteraction, { once: true });
         document.addEventListener('touchstart', startBackgroundMusicOnInteraction, { once: true });
       });
+
+      // 🖥️ 키오스크 모드 초기화 (맥북 크롬 호환 버전)
+      function initKioskMode() {
+        console.log('🖥️ 키오스크 모드 초기화 시작 (안전 모드)');
+        
+        // 전체화면 지원 여부 확인
+        const elem = document.documentElement;
+        const fullscreenSupported = !!(elem.requestFullscreen || 
+                                      elem.webkitRequestFullscreen || 
+                                      elem.mozRequestFullScreen || 
+                                      elem.msRequestFullscreen);
+        
+        console.log('🖥️ 전체화면 지원:', fullscreenSupported);
+        
+        if (!fullscreenSupported) {
+          console.warn('🖥️ ⚠️ 이 브라우저는 전체화면 API를 지원하지 않습니다');
+          // 전체화면 버튼 비활성화
+          const fullscreenBtn = document.getElementById('fullscreenToggle');
+          if (fullscreenBtn) {
+            fullscreenBtn.style.opacity = '0.5';
+            fullscreenBtn.style.cursor = 'not-allowed';
+            fullscreenBtn.title = '전체화면을 지원하지 않는 브라우저입니다';
+          }
+        }
+        
+        // 화면 회전 잠금 (모바일에서만)
+        if (window.innerWidth <= 1024 && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(err => {
+            console.log('🔄 화면 회전 잠금 실패 (권한 필요):', err);
+          });
+        }
+        
+        // 더블탭 줌 방지 (모바일에서만)
+        if (window.innerWidth <= 1024) {
+          let lastTouchEnd = 0;
+          document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+              event.preventDefault();
+            }
+            lastTouchEnd = now;
+          }, false);
+        }
+        
+        // F11키로 전체화면 토글 (데스크톱에서만)
+        if (window.innerWidth > 1024) {
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') {
+              e.preventDefault();
+              toggleFullscreen();
+            }
+          });
+        }
+        
+        console.log('🖥️ 키오스크 모드 설정 완료 (안전 모드)');
+      }
+
+      // 전체화면 요청 (간소화된 버전)
+      function requestFullscreenMode() {
+        if (!document.fullscreenElement) {
+          const elem = document.documentElement;
+          
+          console.log('🖥️ 전체화면 모드 요청 시작...');
+          
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen().then(() => {
+              console.log('🖥️ ✅ 전체화면 모드 활성화');
+            }).catch(err => {
+              console.log('🖥️ ❌ 전체화면 요청 실패:', err);
+            });
+          } else if (elem.webkitRequestFullscreen) { // Safari
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { // IE/Edge
+            elem.msRequestFullscreen();
+          } else if (elem.mozRequestFullScreen) { // Firefox
+            elem.mozRequestFullScreen();
+          }
+        }
+      }
       
       // 5초 후 동영상 상태 확인
       setTimeout(() => {

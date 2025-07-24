@@ -936,17 +936,37 @@ class MotionBedApp {
         </video>
       </div>
       
-      <!-- 소리 토글 버튼 - 비디오 컨테이너 밖으로 이동 -->
+      <!-- 소리 토글 버튼 - 오른쪽 상단 (전체화면 버튼과 구별) -->
       <div id="soundToggle" onclick="toggleVideoSound(event)"
-           style="position: absolute; top: 16px; right: 16px; z-index: 10000; 
-                  background: rgba(0, 0, 0, 0.5); padding: 6px 10px; border-radius: 50%; 
-                  font-size: 1.5rem; color: white; cursor: pointer; line-height: 1; 
-                  width: 40px; height: 40px; text-align: center; display: flex; 
-                  align-items: center; justify-content: center; backdrop-filter: blur(4px);
-                  transition: 0.2s;"
-           onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
-           onmouseout="this.style.background='rgba(0, 0, 0, 0.5)'">
+           style="position: absolute; top: 20px; right: 20px; z-index: 10000; 
+                  background: rgba(34, 197, 94, 0.7); padding: 8px 12px; border-radius: 8px; 
+                  font-size: 1.8rem; color: white; cursor: pointer; line-height: 1; 
+                  width: 50px; height: 50px; text-align: center; display: flex; 
+                  align-items: center; justify-content: center; backdrop-filter: blur(10px);
+                  -webkit-backdrop-filter: blur(10px); transition: all 0.2s ease;
+                  border: 2px solid rgba(255, 255, 255, 0.2);"
+           onmouseover="this.style.background='rgba(34, 197, 94, 0.9)'; this.style.transform='scale(1.1)'; this.style.borderColor='rgba(255, 255, 255, 0.4)'"
+           onmouseout="this.style.background='rgba(34, 197, 94, 0.7)'; this.style.transform='scale(1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
         🔇
+      </div>
+      
+      <!-- 전체화면 토글 버튼 - 왼쪽 상단 (fullscreen-test.html 방식) -->
+      <div id="fullscreenToggle" onclick="toggleFullscreen()"
+           style="position: absolute; top: 20px; left: 20px; z-index: 10000; 
+                  background: rgba(0, 0, 0, 0.7); padding: 8px 12px; border-radius: 8px; 
+                  color: white; cursor: pointer; line-height: 1; 
+                  width: 50px; height: 50px; text-align: center; display: flex; 
+                  align-items: center; justify-content: center; backdrop-filter: blur(10px);
+                  -webkit-backdrop-filter: blur(10px); transition: all 0.2s ease;
+                  border: 2px solid rgba(255, 255, 255, 0.2);" title="전체화면 모드"
+           onmouseover="this.style.background='rgba(30, 64, 175, 0.8)'; this.style.transform='scale(1.1)'; this.style.borderColor='rgba(255, 255, 255, 0.4)'"
+           onmouseout="this.style.background='rgba(0, 0, 0, 0.7)'; this.style.transform='scale(1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 14H5V19H10V17H7V14Z" fill="currentColor"/>
+          <path d="M5 10H7V7H10V5H5V10Z" fill="currentColor"/>
+          <path d="M17 14H19V19H14V17H17V14Z" fill="currentColor"/>
+          <path d="M14 5V7H17V10H19V5H14Z" fill="currentColor"/>
+        </svg>
       </div>
     `;
   }
