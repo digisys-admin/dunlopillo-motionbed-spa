@@ -9,9 +9,9 @@ const USE_GOOGLE_DRIVE = false; // Google Drive 이미지 사용
  * 🎬 간단한 동영상 설정 (참고 코드 방식)
  */
 const VIDEO_SOURCES = [
-  "https://res.cloudinary.com/di2pd92t1/video/upload/v1748237173/Dunlopillo-Crash-Test-Flexibilitet-web_n045ph.mp4",
-  "https://res.cloudinary.com/di2pd92t1/video/upload/v1748237657/Dunlopillo-Crash-Test-Stabilitet-web_mvxr27.mp4", 
-  "https://res.cloudinary.com/di2pd92t1/video/upload/v1748241410/Dunlopillo-Crash-Test-Allergivenlig-A%CC%8Andba%CC%8Ar-web_wxolsb.mp4"
+  "https://res.cloudinary.com/di2pd92t1/video/upload/v1753767432/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_01_tt5wqe.mp4",
+  "https://res.cloudinary.com/di2pd92t1/video/upload/v1753767434/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_02_n8rnf8.mp4", 
+  "https://res.cloudinary.com/di2pd92t1/video/upload/v1753767442/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_03_x67vjb.mp4"
 ];
 
 // 동영상 사용 여부
@@ -132,6 +132,16 @@ const GOOGLE_DRIVE_IMAGES = {
     fullsize: 'https://drive.google.com/uc?export=view&id=1H1siigzXCv5aBG4RSDKqRJdUPQ0GmR2i',
     direct: 'https://lh3.googleusercontent.com/d/1H1siigzXCv5aBG4RSDKqRJdUPQ0GmR2i=w1200'
   },
+  P16_HAND1: {
+    thumbnail: 'https://drive.google.com/thumbnail?id=1xKhWBQjlxzjBui_f4sSCLPYiWATeCz23&sz=w400',
+    fullsize: 'https://drive.google.com/uc?export=view&id=1xKhWBQjlxzjBui_f4sSCLPYiWATeCz23',
+    direct: 'https://lh3.googleusercontent.com/d/1xKhWBQjlxzjBui_f4sSCLPYiWATeCz23=w600'
+  },
+  P16_HAND2: {
+    thumbnail: 'https://drive.google.com/thumbnail?id=1TKJxBOEL2Uae44pxeVlly-d16oxDEPDp&sz=w400',
+    fullsize: 'https://drive.google.com/uc?export=view&id=1TKJxBOEL2Uae44pxeVlly-d16oxDEPDp',
+    direct: 'https://lh3.googleusercontent.com/d/1TKJxBOEL2Uae44pxeVlly-d16oxDEPDp=w600'
+  },
   P17_REMOTE: {
     thumbnail: 'https://drive.google.com/thumbnail?id=1KGg5ln4hV4Z5tyhNewEYRjXnS_OmvtYW&sz=w600',
     fullsize: 'https://drive.google.com/uc?export=view&id=1KGg5ln4hV4Z5tyhNewEYRjXnS_OmvtYW',
@@ -184,6 +194,8 @@ const LOCAL_IMAGES = {
   P15_PIC1: 'assets/pics/p15_pic1.png',
   P15_REMOTE: 'assets/pics/p15_remote.png',
   P16_PIC1: 'assets/pics/p16_pic1.png',
+  P16_HAND1: 'assets/pics/p16_hand1.png',
+  P16_HAND2: 'assets/pics/p16_hand2.png',
   P17_REMOTE: 'assets/pics/p17_remote.png',
   P19_PIC1: 'assets/pics/p19_pic1.png'
 };
@@ -256,6 +268,8 @@ const IMG = USE_GOOGLE_DRIVE ? {
   P15_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P15_PIC1, LOCAL_IMAGES.P15_PIC1),
   P15_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P15_REMOTE, LOCAL_IMAGES.P15_REMOTE),
   P16_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_PIC1, LOCAL_IMAGES.P16_PIC1),
+  P16_HAND1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_HAND1, LOCAL_IMAGES.P16_HAND1),
+  P16_HAND2: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_HAND2, LOCAL_IMAGES.P16_HAND2),
   P17_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P17_REMOTE, LOCAL_IMAGES.P17_REMOTE),
   P19_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P19_PIC1, LOCAL_IMAGES.P19_PIC1)
 } : LOCAL_IMAGES;
@@ -749,7 +763,7 @@ const screens = {
               <p class="page2-intro-text">던롭필로는 모션베드 튜토리얼을 제공하고<br />경험을 모아 최고의 수면을 제공합니다.</p>
               <div class="page2-rectangle"></div>
               <div class="page2-rectangle-2"></div>
-              <p class="page2-okin-text">던롭필로의 모션베드는 세계 최대의<br />모션베드 제조사 에르고모션에서 제작됩니다.<br /><br />독일 OKIN사의 전용 모터를 통해<br />정전 시에도 안전합니다.</p>
+              <p class="page2-okin-text">던롭필로의 모션베드는 세계 최대의<br />모션베드 제조사 에르고모션에서 <br />제작됩니다.<br /><br />독일 OKIN사의 전용 모터를 통해<br />정전 시에도 안전합니다.</p>
               <img class="page2-group" src="${IMG.PAGE2_GROUP}" onerror="this.src='${LOCAL_IMAGES.PAGE2_GROUP}'" />
             </div>
             <div class="page2-title-main">왜 던롭필로 모션베드여야 할까요?</div>
@@ -897,11 +911,10 @@ const screens = {
           <div class="page6-content-group">
             <p class="page6-text-1">
               연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.<br />
-              다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.
+              <span style="white-space: nowrap;">다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.</span><br />
             </p>
             <p class="page6-text-2">
-              이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면<br />
-              부종이 완화되거나 허리/어깨가 편해지는 것을 느끼실 수 있습니다.
+              이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면 부종이 완화되거나 <br />허리/어깨가 편해지는 것을 느끼실 수 있습니다.<br />
             </p>
           </div>
         </div>
@@ -1011,7 +1024,7 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              <span style="white-space: nowrap;">실제로 많은 분들이 주무실 때, 코가 조금 막히거나 코골이를 심하게 하시는 경우가 있는데요.</span><br />
+              실제로 많은 분들이 주무실 때, 코가 조금 막히거나 코골이를 심하게 하시는 경우가 있는데요.</span><br />
               이 때 모션베드를 통해 머리를 조금 올려 기도를 확보하면 숨쉬기 편해지고<br />
               코골이나 무호흡증 또한 완화될 수 있습니다.
             </p>
@@ -1181,8 +1194,8 @@ const screens = {
           <div class="page6-content-group">
             <p class="page6-text-1">
               이 자세는 영어로 Perfect Recovery Posture 라고도 하는데요.<br />
-              이는 '가장 완벽한 회복자세'라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서<br />
-              <span style="white-space: nowrap;">수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현해낸 자세입니다.</span><br />
+              <span style="white-space: nowrap;">이는 '가장 완벽한 회복자세'라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서</span><br />
+              수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현했습니다.
             </p>
             <p class="page6-text-2">
             <br />
@@ -1239,21 +1252,126 @@ const screens = {
         
         ${COMMON_ELEMENTS.getProgressBar('page16')}
         
-        <div class="page6-content-wrapper">
-          <div class="page6-content-group">
-            <p class="page6-text-1">
+        <!-- TIP 라벨 - 기존 글로벌 스타일 적용 -->
+        <div style="
+          position: absolute;
+          height: 44px;
+          top: 170px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-family: var(--font-bold);
+          font-weight: 700;
+          color: var(--primary-blue);
+          font-size: 48px;
+          letter-spacing: 0;
+          line-height: 44.2px;
+          white-space: nowrap;
+        ">TIP!</div>
+        
+        <!-- 손 이미지들 - TIP 라벨 바로 아래에 배치 -->
+        <div class="page16-hand-images" style="
+          position: absolute;
+          top: 230px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 5px;
+          z-index: 99;
+          width: auto;
+          height: auto;
+        ">
+          <img class="page16-hand-img" 
+               src="${GOOGLE_DRIVE_IMAGES.P16_HAND1.direct}" 
+               onerror="console.log('구글드라이브 실패, 로컬로 전환:', this.src); this.src='${LOCAL_IMAGES.P16_HAND1}';"
+               alt="Hand Image 1" style="
+            width: 266px;
+            height: 266px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            position: relative;
+          " onload="console.log('✅ P16_HAND1 로드 성공:', this.src)" />
+          <img class="page16-hand-img" 
+               src="${GOOGLE_DRIVE_IMAGES.P16_HAND2.direct}" 
+               onerror="console.log('구글드라이브 실패, 로컬로 전환:', this.src); this.src='${LOCAL_IMAGES.P16_HAND2}';"
+               alt="Hand Image 2" style="
+            width: 266pxpx;
+            height: 266px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            position: relative;
+          " onload="console.log('✅ P16_HAND2 로드 성공:', this.src)" />
+        </div>
+
+        <!-- Content Wrapper - 기존 글로벌 스타일 적용 -->
+        <div style="
+          position: absolute;
+          width: 703px;
+          height: 200px;
+          top: 510px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: var(--light-gray);
+          border-radius: 15px;
+          box-shadow: 2px 3px 6px 2px #00000040;
+        ">
+          <div style="
+            position: relative;
+            width: 635px;
+            height: 180px;
+            top: 20px;
+            left: 34px;
+            text-align: left;
+          ">
+            <p style="
+              position: absolute;
+              height: 85px;
+              top: 0;
+              left: -12px;
+              font-family: 'Pretendard-Medium', Helvetica;
+              font-weight: 500;
+              color: var(--black);
+              font-size: 22px;
+              letter-spacing: -2.00px;
+              line-height: 30.6px;
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              overflow: visible;
+              white-space: normal;
+              text-align: left !important;
+              text-indent: 0 !important;
+              direction: ltr;
+            ">
               혹시 어딘지 모르게 불편하지는 않으신가요?<br />
-              그건 바로 지금까지 모션베드를 체험하면서 몸이 편안한 상태에 적응되었기 때문입니다.
+              <span style="white-space: nowrap;">그건 바로 지금까지 모션베드를 체험하면서 몸이 편안한 상태에 적응되었기 때문입니다.</span>
             </p>
-            <p class="page6-text-2">
+            <p style="
+              position: absolute;
+              height: 85px;
+              top: 95px;
+              left: -12px;
+              font-family: 'Pretendard-Medium', Helvetica;
+              font-weight: 500;
+              color: var(--black);
+              font-size: 22px;
+              letter-spacing: -2.00px;
+              line-height: 30.6px;
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              overflow: visible;
+              white-space: normal;
+              text-align: left !important;
+              text-indent: 0 !important;
+              direction: ltr;
+            ">
               던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽히 호환되기에<br />
               더욱 안정감 있고 편안한 휴식 및 숙면을 취하는 데 도움이 될 거라고 확신합니다.
             </p>
           </div>
-        </div>
-        
-        <div class="page6-tip-label">TIP!</div>
-      </div>
+        </div>      </div>
     `
   },
 

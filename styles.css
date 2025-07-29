@@ -1098,16 +1098,16 @@ body {
 
 .page2-okin-text {
   position: absolute;
-  height: 125px;
+  height: 145px;
   top: 582px;
-  left: 1045px;
+  left: 1055px;
   font-family: "Pretendard", Helvetica;
   font-weight: 400;
   color: #000000;
-  font-size: 16px;
+  font-size: 18px;
   text-align: center;
   letter-spacing: -0.80px;
-  line-height: 24.8px;
+  line-height: 26px;
 }
 
 .page2-group {
@@ -1161,13 +1161,13 @@ body {
 
 .page2-kg-text {
   position: absolute;
-  height: 125px;
+  height: 145px;
   top: 264px;
-  left: 27px;
+  left: 10px;
   font-family: "Pretendard", Helvetica;
   font-weight: 400;
   color: #000000;
-  font-size: 16px;
+  font-size: 18px;
   text-align: center;
   letter-spacing: -0.80px;
   line-height: 24.8px;
@@ -1262,7 +1262,11 @@ body {
   font-size: 14px;
   text-align: center;
   letter-spacing: 0;
-  line-height: normal;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
 }
 
 .progress-step-1 { top: 4px; }
@@ -1937,11 +1941,11 @@ body {
   position: absolute;
   height: 85px; /* 기존 62px에서 23px 증가 - 더 많은 텍스트 수용 */
   top: 0;
-  left: 0;
+  left: -12px;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 20px; /* 기존 폰트 크기 유지 */
+  font-size: 22px; /* 기존 폰트 크기 유지 */
   letter-spacing: -2.00px; /* 기존 자간 유지 */
   line-height: 30.6px; /* 기존 줄간격 유지 */
   margin: 0;
@@ -1956,13 +1960,13 @@ body {
 
 .page6-text-2 {
   position: absolute;
-  height: 62px; /* 기존 높이 유지 */
+  height: 85px; /* 기존 높이 유지 */
   top: 95px; /* 기존 85px에서 10px 더 아래로 - 겹침 방지 */
-  left: 0;
+  left: -12px;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 20px; /* 기존 폰트 크기 유지 */
+  font-size: 22px; /* 기존 폰트 크기 유지 */
   letter-spacing: -2.00px; /* 기존 자간 유지 */
   line-height: 30.6px; /* 기존 줄간격 유지 */
   margin: 0;
