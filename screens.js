@@ -245,34 +245,35 @@ function createSmartImageSource(googleDriveUrls, localUrl) {
   return imageSource;
 }
 
-// 현재 사용할 이미지 소스 선택 (스마트 폴백 포함)
-const IMG = USE_GOOGLE_DRIVE ? {
-  LOGO: createSmartImageSource(GOOGLE_DRIVE_IMAGES.LOGO, LOCAL_IMAGES.LOGO),
-  LOGO_WHITE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.LOGO_WHITE, LOCAL_IMAGES.LOGO_WHITE),
-  PAGE2_GROUP: createSmartImageSource(GOOGLE_DRIVE_IMAGES.PAGE2_GROUP, LOCAL_IMAGES.PAGE2_GROUP),
-  PAGE2_BED: createSmartImageSource(GOOGLE_DRIVE_IMAGES.PAGE2_BED, LOCAL_IMAGES.PAGE2_BED),
-  P3_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P3_PIC1, LOCAL_IMAGES.P3_PIC1),
-  P4_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P4_PIC1, LOCAL_IMAGES.P4_PIC1),
-  P4_REMOTE1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P4_REMOTE1, LOCAL_IMAGES.P4_REMOTE1),
-  P6_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P6_PIC1, LOCAL_IMAGES.P6_PIC1),
-  P6_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P6_REMOTE, LOCAL_IMAGES.P6_REMOTE),
-  P7_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P7_PIC1, LOCAL_IMAGES.P7_PIC1),
-  P7_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P7_REMOTE, LOCAL_IMAGES.P7_REMOTE),
-  P9_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P9_PIC1, LOCAL_IMAGES.P9_PIC1),
-  P10_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P10_PIC1, LOCAL_IMAGES.P10_PIC1),
-  P11_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P11_PIC1, LOCAL_IMAGES.P11_PIC1),
-  P11_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P11_REMOTE, LOCAL_IMAGES.P11_REMOTE),
-  P13_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P13_PIC1, LOCAL_IMAGES.P13_PIC1),
-  P13_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P13_REMOTE, LOCAL_IMAGES.P13_REMOTE),
-  P14_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P14_PIC1, LOCAL_IMAGES.P14_PIC1),
-  P15_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P15_PIC1, LOCAL_IMAGES.P15_PIC1),
-  P15_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P15_REMOTE, LOCAL_IMAGES.P15_REMOTE),
-  P16_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_PIC1, LOCAL_IMAGES.P16_PIC1),
-  P16_HAND1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_HAND1, LOCAL_IMAGES.P16_HAND1),
-  P16_HAND2: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P16_HAND2, LOCAL_IMAGES.P16_HAND2),
-  P17_REMOTE: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P17_REMOTE, LOCAL_IMAGES.P17_REMOTE),
-  P19_PIC1: createSmartImageSource(GOOGLE_DRIVE_IMAGES.P19_PIC1, LOCAL_IMAGES.P19_PIC1)
-} : LOCAL_IMAGES;
+// 현재 사용할 이미지 소스 선택 (로컬 우선, 빠른 로딩)
+const IMG = {
+  // 모든 이미지를 로컬 우선으로 사용 (Netlify CDN 활용)
+  LOGO: LOCAL_IMAGES.LOGO,
+  LOGO_WHITE: LOCAL_IMAGES.LOGO_WHITE,
+  PAGE2_GROUP: LOCAL_IMAGES.PAGE2_GROUP,
+  PAGE2_BED: LOCAL_IMAGES.PAGE2_BED,
+  P3_PIC1: LOCAL_IMAGES.P3_PIC1,
+  P4_PIC1: LOCAL_IMAGES.P4_PIC1,
+  P4_REMOTE1: LOCAL_IMAGES.P4_REMOTE1,
+  P6_PIC1: LOCAL_IMAGES.P6_PIC1,
+  P6_REMOTE: LOCAL_IMAGES.P6_REMOTE,
+  P7_PIC1: LOCAL_IMAGES.P7_PIC1,
+  P7_REMOTE: LOCAL_IMAGES.P7_REMOTE,
+  P9_PIC1: LOCAL_IMAGES.P9_PIC1,
+  P10_PIC1: LOCAL_IMAGES.P10_PIC1,
+  P11_PIC1: LOCAL_IMAGES.P11_PIC1,
+  P11_REMOTE: LOCAL_IMAGES.P11_REMOTE,
+  P13_PIC1: LOCAL_IMAGES.P13_PIC1,
+  P13_REMOTE: LOCAL_IMAGES.P13_REMOTE,
+  P14_PIC1: LOCAL_IMAGES.P14_PIC1,
+  P15_PIC1: LOCAL_IMAGES.P15_PIC1,
+  P15_REMOTE: LOCAL_IMAGES.P15_REMOTE,
+  P16_PIC1: LOCAL_IMAGES.P16_PIC1,
+  P16_HAND1: LOCAL_IMAGES.P16_HAND1,
+  P16_HAND2: LOCAL_IMAGES.P16_HAND2,
+  P17_REMOTE: LOCAL_IMAGES.P17_REMOTE,
+  P19_PIC1: LOCAL_IMAGES.P19_PIC1
+};
 
 // 현재 사용할 동영상 소스 선택
 const VIDEO = USE_GOOGLE_DRIVE ? GOOGLE_DRIVE_VIDEOS : LOCAL_VIDEOS;
@@ -1281,8 +1282,7 @@ const screens = {
           height: auto;
         ">
           <img class="page16-hand-img" 
-               src="${GOOGLE_DRIVE_IMAGES.P16_HAND1.direct}" 
-               onerror="console.log('구글드라이브 실패, 로컬로 전환:', this.src); this.src='${LOCAL_IMAGES.P16_HAND1}';"
+               src="${LOCAL_IMAGES.P16_HAND1}" 
                alt="Hand Image 1" style="
             width: 266px;
             height: 266px;
@@ -1290,18 +1290,17 @@ const screens = {
             object-fit: cover;
             display: block;
             position: relative;
-          " onload="console.log('✅ P16_HAND1 로드 성공:', this.src)" />
+          " onload="console.log('✅ P16_HAND1 로컬 로드 성공')" />
           <img class="page16-hand-img" 
-               src="${GOOGLE_DRIVE_IMAGES.P16_HAND2.direct}" 
-               onerror="console.log('구글드라이브 실패, 로컬로 전환:', this.src); this.src='${LOCAL_IMAGES.P16_HAND2}';"
+               src="${LOCAL_IMAGES.P16_HAND2}" 
                alt="Hand Image 2" style="
-            width: 266pxpx;
+            width: 266px;
             height: 266px;
             border-radius: 12px;
             object-fit: cover;
             display: block;
             position: relative;
-          " onload="console.log('✅ P16_HAND2 로드 성공:', this.src)" />
+          " onload="console.log('✅ P16_HAND2 로컬 로드 성공')" />
         </div>
 
         <!-- Content Wrapper - 기존 글로벌 스타일 적용 -->
