@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>던롭필로 SPA - 데이터 수집 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        .section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .primary { background: #4299e1; color: white; }
+        .success { background: #48bb78; color: white; }
+        .warning { background: #ed8936; color: white; }
+        .info { background: #38b2ac; color: white; }
+
+        .rating-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .rating-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #4a5568;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .rating-btn:hover {
+            background: #ffd700;
+            color: #2d3748;
+        }
+
+        .rating-btn.selected {
+            background: #ffd700;
+            color: #2d3748;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        #log {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+
+        .status-card {
+            background: #2d3748;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .status-card h3 {
+            margin: 0 0 10px 0;
+            color: #90cdf4;
+        }
+
+        .status-value {
+            font-family: monospace;
+            background: #4a5568;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛏️ 던롭필로 SPA - 데이터 수집 테스트</h1>
+        
+        <!-- 시스템 상태 -->
+        <div class="section">
+            <h2><span class="emoji">📊</span>시스템 상태</h2>
+            <button class="primary" onclick="checkSystemStatus()">상태 확인</button>
+            <button class="secondary" onclick="checkScriptLoadingStatus()">스크립트 로딩 상태</button>
+            <button class="info" onclick="showDebugInfo()">상세 디버깅 정보</button>
+            <button class="info" onclick="showCurrentData()">수집된 데이터 조회</button>
+            <button class="warning" onclick="resetAllData()">데이터 초기화</button>
+            <div id="systemStatus"></div>
+        </div>
+
+        <!-- 설문조사 테스트 -->
+        <div class="section">
+            <h2><span class="emoji">📝</span>설문조사 테스트</h2>
+            
+            <div>
+                <strong>성별:</strong>
+                <div class="btn-group">
+                    <button class="primary" onclick="saveSurvey('gender', '남성')">남성</button>
+                    <button class="primary" onclick="saveSurvey('gender', '여성')">여성</button>
+                </div>
+            </div>
+
+            <div>
+                <strong>매트리스 경험:</strong>
+                <div class="btn-group">
+                    <button class="success" onclick="saveSurvey('experience', '처음')">처음</button>
+                    <button class="success" onclick="saveSurvey('experience', '경험있음')">경험있음</button>
+                </div>
+            </div>
+
+            <div>
+                <strong>연령대:</strong>
+                <div class="btn-group">
+                    <button class="info" onclick="saveSurvey('age', '20대')">20대</button>
+                    <button class="info" onclick="saveSurvey('age', '30대')">30대</button>
+                    <button class="info" onclick="saveSurvey('age', '40대')">40대</button>
+                    <button class="info" onclick="saveSurvey('age', '50대')">50대</button>
+                    <button class="info" onclick="saveSurvey('age', '60대 이상')">60대 이상</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 별점 평가 테스트 -->
+        <div class="section">
+            <h2><span class="emoji">⭐</span>별점 평가 테스트</h2>
+            
+            <div>
+                <strong>Page5 - 체험 만족도:</strong>
+                <div class="rating-group">
+                    <button class="rating-btn" onclick="saveRating('page5', 1)">1</button>
+                    <button class="rating-btn" onclick="saveRating('page5', 2)">2</button>
+                    <button class="rating-btn" onclick="saveRating('page5', 3)">3</button>
+                    <button class="rating-btn" onclick="saveRating('page5', 4)">4</button>
+                    <button class="rating-btn" onclick="saveRating('page5', 5)">5</button>
+                </div>
+            </div>
+
+            <div>
+                <strong>Page8 - 제품 만족도:</strong>
+                <div class="rating-group">
+                    <button class="rating-btn" onclick="saveRating('page8', 1)">1</button>
+                    <button class="rating-btn" onclick="saveRating('page8', 2)">2</button>
+                    <button class="rating-btn" onclick="saveRating('page8', 3)">3</button>
+                    <button class="rating-btn" onclick="saveRating('page8', 4)">4</button>
+                    <button class="rating-btn" onclick="saveRating('page8', 5)">5</button>
+                </div>
+            </div>
+
+            <div>
+                <strong>Page12 - 구매 의향:</strong>
+                <div class="rating-group">
+                    <button class="rating-btn" onclick="saveRating('page12', 1)">1</button>
+                    <button class="rating-btn" onclick="saveRating('page12', 2)">2</button>
+                    <button class="rating-btn" onclick="saveRating('page12', 3)">3</button>
+                    <button class="rating-btn" onclick="saveRating('page12', 4)">4</button>
+                    <button class="rating-btn" onclick="saveRating('page12', 5)">5</button>
+                </div>
+            </div>
+
+            <div>
+                <strong>Page18 - 추천 의향:</strong>
+                <div class="rating-group">
+                    <button class="rating-btn" onclick="saveRating('page18', 1)">1</button>
+                    <button class="rating-btn" onclick="saveRating('page18', 2)">2</button>
+                    <button class="rating-btn" onclick="saveRating('page18', 3)">3</button>
+                    <button class="rating-btn" onclick="saveRating('page18', 4)">4</button>
+                    <button class="rating-btn" onclick="saveRating('page18', 5)">5</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- API 설정 -->
+        <div class="section">
+            <h2><span class="emoji">🔗</span>API 설정</h2>
+            <input type="url" id="apiEndpoint" placeholder="Google Apps Script 웹 앱 URL 입력" 
+                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin: 10px 0;">
+            <div class="btn-group">
+                <button class="warning" onclick="setApiEndpoint()">API 엔드포인트 설정</button>
+                <button class="info" onclick="testApiConnection()">연결 테스트</button>
+                <button class="primary" onclick="showCurrentEndpoint()">현재 URL 확인</button>
+                <button class="success" onclick="openGoogleAppsScript()">Google Apps Script 열기</button>
+                <button class="secondary" onclick="testWithCurl()">cURL 명령어 생성</button>
+            </div>
+        </div>
+
+        <!-- 일괄 테스트 -->
+        <div class="section">
+            <h2><span class="emoji">🚀</span>일괄 테스트</h2>
+            <button class="success" onclick="runFullTest()">전체 데이터 수집 테스트</button>
+            <button class="primary" onclick="testLegacyCompatibility()">레거시 호환성 테스트</button>
+        </div>
+
+        <!-- 로그 -->
+        <div class="section">
+            <h2><span class="emoji">📄</span>실시간 로그</h2>
+            <button class="info" onclick="clearLog()">로그 지우기</button>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript 파일들 로드 -->
+    <script>
+        // 전역 디버깅 정보
+        window.debugInfo = {
+            loadingStartTime: Date.now(),
+            scriptLoadingStatus: {
+                manager: false,
+                legacy: false
+            },
+            errors: [],
+            logs: []
+        };
+        
+        // 디버그 로그 함수
+        function debugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            window.debugInfo.logs.push(logMessage);
+            console.log('🐛 DEBUG:', logMessage);
+        }
+        
+        debugLog('디버깅 시작');
+        
+        // 전역 에러 핸들러
+        window.addEventListener('error', (e) => {
+            const errorInfo = {
+                filename: e.filename,
+                message: e.message,
+                lineno: e.lineno,
+                colno: e.colno,
+                stack: e.error ? e.error.stack : 'Stack not available'
+            };
+            window.debugInfo.errors.push(errorInfo);
+            console.error('🚨 전역 오류:', errorInfo);
+            debugLog(`오류 발생: ${e.message} (${e.filename}:${e.lineno})`);
+        });
+        
+        // Promise rejection 핸들러
+        window.addEventListener('unhandledrejection', (e) => {
+            const errorInfo = {
+                reason: e.reason,
+                promise: e.promise
+            };
+            window.debugInfo.errors.push(errorInfo);
+            console.error('🚨 처리되지 않은 Promise 거부:', errorInfo);
+            debugLog(`Promise 거부: ${e.reason}`);
+        });
+    </script>
+    
+    <script src="survey-data-manager.js" 
+            onload="window.debugInfo.scriptLoadingStatus.manager = true; debugLog('survey-data-manager.js 로드 완료');" 
+            onerror="debugLog('survey-data-manager.js 로드 실패'); console.error('❌ survey-data-manager.js 로드 실패');"></script>
+    <script src="survey-data.js" 
+            onload="window.debugInfo.scriptLoadingStatus.legacy = true; debugLog('survey-data.js 로드 완료');" 
+            onerror="debugLog('survey-data.js 로드 실패'); console.error('❌ survey-data.js 로드 실패');"></script>
+
+    <script>
+        // 로그 함수
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // 콘솔 로그 캡처
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log('LOG: ' + args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            log('ERROR: ' + args.join(' '));
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            log('WARN: ' + args.join(' '));
+        };
+
+        // 상세 디버깅 정보 표시
+        function showDebugInfo() {
+            log('🐛 === 상세 디버깅 정보 ===');
+            log(`로딩 시작 시간: ${new Date(window.debugInfo.loadingStartTime).toLocaleTimeString()}`);
+            log(`경과 시간: ${Date.now() - window.debugInfo.loadingStartTime}ms`);
+            log('');
+            
+            log('📦 스크립트 로딩 상태:');
+            log(`- survey-data-manager.js: ${window.debugInfo.scriptLoadingStatus.manager ? '✅' : '❌'}`);
+            log(`- survey-data.js: ${window.debugInfo.scriptLoadingStatus.legacy ? '✅' : '❌'}`);
+            log('');
+            
+            log('🌐 전역 객체 상태:');
+            log(`- window.surveyDataManager: ${window.surveyDataManager ? '✅ 존재' : '❌ 없음'}`);
+            log(`- window.SurveyDataManager: ${window.SurveyDataManager ? '✅ 존재' : '❌ 없음'}`);
+            log(`- typeof SurveyDataManager: ${typeof SurveyDataManager}`);
+            log('');
+            
+            if (window.debugInfo.errors.length > 0) {
+                log('🚨 발생한 오류들:');
+                window.debugInfo.errors.forEach((error, index) => {
+                    log(`${index + 1}. ${error.message || error.reason}`);
+                    if (error.filename) log(`   파일: ${error.filename}:${error.lineno}`);
+                    if (error.stack) log(`   스택: ${error.stack.substring(0, 100)}...`);
+                });
+            } else {
+                log('✅ 오류 없음');
+            }
+            log('');
+            
+            log('📋 디버그 로그:');
+            window.debugInfo.logs.forEach(logEntry => {
+                log(logEntry);
+            });
+        }
+
+        // 스크립트 로딩 상태 확인
+        function checkScriptLoadingStatus() {
+            log('📦 스크립트 로딩 상태:');
+            log(`- survey-data-manager.js: ${window.debugInfo.scriptLoadingStatus.manager ? '✅' : '❌'}`);
+            log(`- survey-data.js: ${window.debugInfo.scriptLoadingStatus.legacy ? '✅' : '❌'}`);
+            log(`- window.surveyDataManager: ${window.surveyDataManager ? '✅' : '❌'}`);
+            log(`- window.SurveyDataManager: ${window.SurveyDataManager ? '✅' : '❌'}`);
+            
+            // 추가 진단
+            if (!window.surveyDataManager && window.debugInfo.scriptLoadingStatus.manager) {
+                log('⚠️  스크립트는 로드되었지만 surveyDataManager가 없습니다');
+                log('→ 초기화 과정에서 오류가 발생했을 가능성');
+            }
+        }
+
+        // 시스템 상태 확인 (로딩 대기 포함)
+        function checkSystemStatus() {
+            // SurveyDataManager 로딩 대기
+            if (!window.surveyDataManager) {
+                log('⏳ SurveyDataManager 로딩 대기 중...');
+                setTimeout(checkSystemStatus, 500);
+                return;
+            }
+
+            try {
+                const status = window.surveyDataManager.getSystemStatus();
+                const statusDiv = document.getElementById('systemStatus');
+                
+                statusDiv.innerHTML = `
+                    <div class="status-card">
+                        <h3>📱 시스템 정보</h3>
+                        <div class="status-value">테블릿 ID: ${status.tabletId}</div>
+                        <div class="status-value">사용자 ID: ${status.userId}</div>
+                        <div class="status-value">세션 시간: ${Math.floor(status.sessionDuration / 1000)}초</div>
+                    </div>
+                    <div class="status-card">
+                        <h3>📊 데이터 현황</h3>
+                        <div class="status-value">설문 완료: ${status.surveyComplete ? '✅' : '❌'}</div>
+                        <div class="status-value">별점 개수: ${status.ratingsCount}/4</div>
+                        <div class="status-value">데이터 전송: ${status.dataTransmitted ? '✅' : '❌'}</div>
+                    </div>
+                    <div class="status-card">
+                        <h3>🔗 API 설정</h3>
+                        <div class="status-value">엔드포인트: ${status.apiEndpoint}</div>
+                    </div>
+                `;
+                
+                log('✅ SurveyDataManager 로드 완료 - 시스템 상태 확인 완료');
+            } catch (error) {
+                log(`❌ 시스템 상태 확인 중 오류: ${error.message}`);
+            }
+        }
+
+        // 현재 데이터 조회 (로딩 대기 포함)
+        function showCurrentData() {
+            if (!window.surveyDataManager) {
+                log('⏳ SurveyDataManager 로딩 대기 중...');
+                setTimeout(showCurrentData, 500);
+                return;
+            }
+
+            try {
+                const data = window.surveyDataManager.getCurrentData();
+                log('📊 현재 수집된 데이터:');
+                log(JSON.stringify(data, null, 2));
+            } catch (error) {
+                log(`❌ 데이터 조회 중 오류: ${error.message}`);
+            }
+        }
+
+        // 설문 응답 저장
+        function saveSurvey(question, answer) {
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            window.surveyDataManager.saveSurveyResponse(question, answer);
+            log(`📝 설문 응답 저장: ${question} = ${answer}`);
+        }
+
+        // 별점 저장
+        function saveRating(page, rating) {
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            window.surveyDataManager.saveRating(page, rating);
+            log(`⭐ 별점 저장: ${page} = ${rating}점`);
+
+            // 선택된 버튼 표시
+            const buttons = document.querySelectorAll(`[onclick="saveRating('${page}', ${rating})"]`);
+            buttons.forEach(btn => btn.classList.add('selected'));
+            
+            // 같은 그룹의 다른 버튼들 선택 해제
+            const allButtons = document.querySelectorAll(`[onclick*="saveRating('${page}',"]`);
+            allButtons.forEach(btn => {
+                if (!btn.onclick.toString().includes(`${rating}`)) {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        // API 엔드포인트 설정
+        function setApiEndpoint() {
+            const endpoint = document.getElementById('apiEndpoint').value;
+            if (!endpoint) {
+                log('❌ API 엔드포인트를 입력해주세요');
+                return;
+            }
+
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            window.surveyDataManager.setApiEndpoint(endpoint);
+            log(`🔗 API 엔드포인트 설정: ${endpoint}`);
+        }
+
+        // 현재 엔드포인트 확인
+        function showCurrentEndpoint() {
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            const status = window.surveyDataManager.getSystemStatus();
+            log(`🔗 현재 API 엔드포인트: ${status.apiEndpoint}`);
+        }
+
+        // API 연결 테스트
+        async function testApiConnection() {
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            log('🔄 API 연결 테스트 시작...');
+            
+            const endpoint = window.surveyDataManager._apiEndpoint;
+            log(`🔗 테스트 대상 URL: ${endpoint}`);
+            
+            try {
+                // 1단계: 기본 GET 요청으로 서버 접근 확인
+                log('1️⃣ 단계 1: GET 요청으로 서버 접근 확인...');
+                try {
+                    const getResponse = await fetch(endpoint, {
+                        method: 'GET',
+                        mode: 'cors'
+                    });
+                    log(`📡 GET 응답 상태: ${getResponse.status} ${getResponse.statusText}`);
+                    const getText = await getResponse.text();
+                    log(`📄 GET 응답 내용: ${getText.substring(0, 200)}...`);
+                } catch (getError) {
+                    log(`❌ GET 요청 실패: ${getError.message}`);
+                }
+                
+                // 2단계: POST 요청으로 실제 테스트
+                log('2️⃣ 단계 2: POST 요청으로 테스트 데이터 전송...');
+                
+                // 테스트 데이터 생성
+                const testData = {
+                    tabletId: 'TEST_TABLET',
+                    userId: 'TEST_USER',
+                    survey: { gender: '테스트', experience: '테스트', age: '테스트' },
+                    ratings: { page5: 1, page8: 2, page12: 3, page18: 4 },
+                    sessionStart: new Date().toISOString(),
+                    sessionEnd: new Date().toISOString(),
+                    ipAddress: 'test',
+                    browserInfo: 'test',
+                    isFinal: true,
+                    timestamp: new Date().toISOString(),
+                    isTest: true  // 테스트 데이터임을 표시
+                };
+
+                log(`📤 전송할 데이터: ${JSON.stringify(testData, null, 2)}`);
+
+                // POST 요청 실행
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData),
+                    mode: 'cors'
+                });
+
+                log(`📡 POST 응답 상태: ${response.status} ${response.statusText}`);
+                log(`📋 응답 헤더: ${JSON.stringify([...response.headers.entries()])}`);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    log('✅ API 연결 성공!');
+                    log(`📄 응답 데이터: ${JSON.stringify(result, null, 2)}`);
+                } else {
+                    log(`❌ API 연결 실패: ${response.status} ${response.statusText}`);
+                    const errorText = await response.text();
+                    log(`📄 오류 내용: ${errorText}`);
+                }
+            } catch (error) {
+                log(`❌ API 연결 테스트 실패: ${error.message}`);
+                log(`🔍 오류 타입: ${error.name}`);
+                log(`📋 오류 스택: ${error.stack}`);
+                log('');
+                log('💡 가능한 원인:');
+                log('   1. Google Apps Script URL이 잘못됨');
+                log('   2. 웹 앱이 "모든 사용자" 권한으로 배포되지 않음');
+                log('   3. CORS 설정 문제');
+                log('   4. Google Apps Script 코드 오류');
+                log('   5. 네트워크 연결 문제');
+                log('');
+                log('🔧 해결 방법:');
+                log('   1. Google Apps Script 콘솔에서 배포 상태 확인');
+                log('   2. 실행 권한을 "모든 사용자"로 설정');
+                log('   3. 새 배포 버전 생성');
+            }
+        }
+
+        // Google Apps Script 열기
+        function openGoogleAppsScript() {
+            const endpoint = window.surveyDataManager._apiEndpoint;
+            log(`🔗 Google Apps Script URL: ${endpoint}`);
+            log('🌐 브라우저에서 직접 확인해보세요');
+            window.open(endpoint, '_blank');
+        }
+
+        // cURL 명령어 생성
+        function testWithCurl() {
+            const endpoint = window.surveyDataManager._apiEndpoint;
+            const testData = {
+                tabletId: 'TEST_TABLET',
+                userId: 'TEST_USER',
+                survey: { gender: '테스트', experience: '테스트', age: '테스트' },
+                ratings: { page5: 1, page8: 2, page12: 3, page18: 4 },
+                sessionStart: new Date().toISOString(),
+                sessionEnd: new Date().toISOString(),
+                ipAddress: 'test',
+                browserInfo: 'test',
+                isFinal: true,
+                timestamp: new Date().toISOString(),
+                isTest: true
+            };
+
+            const curlCommand = `curl -X POST "${endpoint}" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(testData, null, 2)}'`;
+
+            log('📋 터미널에서 다음 명령어를 실행해보세요:');
+            log('');
+            log(curlCommand);
+            log('');
+            log('💡 이 명령어로 직접 API 테스트가 가능합니다');
+        }
+
+        // 전체 테스트
+        function runFullTest() {
+            log('🚀 전체 데이터 수집 테스트 시작');
+            
+            // 설문조사 데이터
+            saveSurvey('gender', '남성');
+            setTimeout(() => saveSurvey('experience', '처음'), 500);
+            setTimeout(() => saveSurvey('age', '30대'), 1000);
+            
+            // 별점 데이터
+            setTimeout(() => saveRating('page5', 5), 1500);
+            setTimeout(() => saveRating('page8', 4), 2000);
+            setTimeout(() => saveRating('page12', 3), 2500);
+            setTimeout(() => saveRating('page18', 5), 3000);
+            
+            setTimeout(() => {
+                log('✅ 전체 테스트 완료');
+                showCurrentData();
+            }, 3500);
+        }
+
+        // 레거시 호환성 테스트
+        function testLegacyCompatibility() {
+            log('🔄 레거시 호환성 테스트 시작');
+            
+            if (!window.surveyData) {
+                log('❌ window.surveyData가 없습니다');
+                return;
+            }
+
+            if (!window.saveSurveyResponse || !window.saveRating) {
+                log('❌ 전역 함수들이 없습니다');
+                return;
+            }
+
+            // 레거시 함수 테스트
+            window.saveSurveyResponse('gender', '여성');
+            window.saveRating(5, 4);
+            
+            // 레거시 객체 테스트
+            log('📊 레거시 응답 데이터:');
+            log(JSON.stringify(window.surveyData.responses, null, 2));
+            
+            log('✅ 레거시 호환성 테스트 완료');
+        }
+
+        // 데이터 초기화
+        function resetAllData() {
+            if (!window.surveyDataManager) {
+                log('❌ SurveyDataManager가 로드되지 않았습니다');
+                return;
+            }
+
+            window.surveyDataManager.resetData();
+            log('🗑️ 모든 데이터가 초기화되었습니다');
+            
+            // 선택된 버튼들 초기화
+            document.querySelectorAll('.rating-btn.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        // 로그 지우기
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+            log('🧹 로그가 지워졌습니다');
+        }
+
+        // 페이지 로드 완료 시
+        window.addEventListener('load', () => {
+            log('🚀 테스트 페이지 로드 완료');
+            log('📋 사용 가능한 기능들을 테스트해보세요');
+            
+            // 스크립트 로딩 상태 먼저 확인
+            checkScriptLoadingStatus();
+            
+            // SurveyDataManager 로딩 상태 확인
+            if (window.surveyDataManager) {
+                log('✅ SurveyDataManager 이미 로드됨');
+                checkSystemStatus();
+            } else {
+                log('⏳ SurveyDataManager 로딩 대기...');
+                // 시스템 상태 자동 확인 (재시도 로직 포함)
+                setTimeout(checkSystemStatus, 100);
+            }
+        });
+    </script>
+</body>
+</html>

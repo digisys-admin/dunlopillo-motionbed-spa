@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 SurveyDataManager 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .log {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .primary { background-color: #007acc; color: white; }
+        .secondary { background-color: #6c757d; color: white; }
+        .success { background-color: #28a745; color: white; }
+        .danger { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 간단한 SurveyDataManager 테스트</h1>
+        
+        <div>
+            <button class="primary" onclick="testBasicLoading()">기본 로딩 테스트</button>
+            <button class="secondary" onclick="testClassDefinition()">클래스 정의 확인</button>
+            <button class="success" onclick="testInstanceCreation()">인스턴스 생성 테스트</button>
+            <button class="danger" onclick="clearLog()">로그 지우기</button>
+        </div>
+        
+        <div id="log" class="log"></div>
+    </div>
+
+    <!-- 디버깅을 위한 스크립트 -->
+    <script>
+        const logElement = document.getElementById('log');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            logElement.textContent += logMessage;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        // 전역 오류 핸들러
+        window.addEventListener('error', (e) => {
+            log(`❌ 오류: ${e.message} (${e.filename}:${e.lineno})`);
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            log(`❌ Promise 거부: ${e.reason}`);
+        });
+        
+        // 테스트 함수들
+        function testBasicLoading() {
+            log('🧪 === 기본 로딩 테스트 ===');
+            log(`window.SurveyDataManager: ${typeof window.SurveyDataManager}`);
+            log(`window.surveyDataManager: ${typeof window.surveyDataManager}`);
+            
+            if (window.surveyDataManager) {
+                log('✅ surveyDataManager 인스턴스 존재');
+                try {
+                    const status = window.surveyDataManager.getSystemStatus();
+                    log('✅ getSystemStatus() 호출 성공');
+                    log(`테블릿 ID: ${status.tabletId}`);
+                } catch (error) {
+                    log(`❌ getSystemStatus() 호출 실패: ${error.message}`);
+                }
+            } else {
+                log('❌ surveyDataManager 인스턴스 없음');
+            }
+        }
+        
+        function testClassDefinition() {
+            log('🧪 === 클래스 정의 확인 ===');
+            
+            try {
+                log(`SurveyDataManager 타입: ${typeof SurveyDataManager}`);
+                if (typeof SurveyDataManager === 'function') {
+                    log('✅ SurveyDataManager 클래스 정의됨');
+                    
+                    // 클래스 메서드 확인
+                    log(`getInstance 메서드: ${typeof SurveyDataManager.getInstance}`);
+                    
+                    if (SurveyDataManager.prototype) {
+                        const methods = Object.getOwnPropertyNames(SurveyDataManager.prototype);
+                        log(`프로토타입 메서드들: ${methods.join(', ')}`);
+                    }
+                } else {
+                    log('❌ SurveyDataManager 클래스 정의되지 않음');
+                }
+            } catch (error) {
+                log(`❌ 클래스 확인 중 오류: ${error.message}`);
+            }
+        }
+        
+        function testInstanceCreation() {
+            log('🧪 === 인스턴스 생성 테스트 ===');
+            
+            try {
+                if (typeof SurveyDataManager !== 'undefined') {
+                    log('SurveyDataManager 클래스 확인됨, 인스턴스 생성 시도...');
+                    const instance = SurveyDataManager.getInstance();
+                    log(`인스턴스 생성 결과: ${typeof instance}`);
+                    
+                    if (instance) {
+                        log('✅ 인스턴스 생성 성공');
+                        
+                        // 메서드 존재 확인
+                        const methods = ['saveSurveyResponse', 'saveRating', 'getSystemStatus', 'getCurrentData'];
+                        methods.forEach(method => {
+                            log(`${method}: ${typeof instance[method]}`);
+                        });
+                    } else {
+                        log('❌ 인스턴스 생성 실패 (null 반환)');
+                    }
+                } else {
+                    log('❌ SurveyDataManager 클래스가 정의되지 않음');
+                }
+            } catch (error) {
+                log(`❌ 인스턴스 생성 중 오류: ${error.message}`);
+                log(`스택: ${error.stack}`);
+            }
+        }
+        
+        // 초기 로딩 상태 확인
+        log('🚀 간단한 테스트 페이지 로드됨');
+        log('📦 스크립트 로딩 전 상태 확인...');
+        testBasicLoading();
+    </script>
+
+    <!-- SurveyDataManager 스크립트 로드 -->
+    <script>
+        log('📦 survey-data-manager.js 로드 시작...');
+    </script>
+    <script src="survey-data-manager.js" 
+            onload="log('✅ survey-data-manager.js 로드 완료'); setTimeout(() => { log('=== 로드 완료 후 상태 ==='); testBasicLoading(); }, 100);" 
+            onerror="log('❌ survey-data-manager.js 로드 실패');"></script>
+    
+    <script>
+        // 추가 확인
+        setTimeout(() => {
+            log('=== 최종 확인 (1초 후) ===');
+            testBasicLoading();
+        }, 1000);
+    </script>
+</body>
+</html>

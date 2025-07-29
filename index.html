@@ -626,47 +626,56 @@
         return isMusicEnabled;
       }
 
-      // 홈 동영상 상태와 배경 음악 동기화
+      // 홈 동영상 상태와 배경 음악 동기화 (개선된 버전)
       function syncMusicWithHomeVideo() {
         const homeVideo = document.getElementById('homeBackgroundVideo');
-        if (homeVideo) {
-          console.log(`🔇 홈 동영상 음소거 상태: ${homeVideo.muted}`);
+        if (!homeVideo) {
+          console.warn('🔇 홈 동영상 요소를 찾을 수 없습니다');
+          return isMusicEnabled;
+        }
+
+        console.log(`🔇 [SYNC] 홈 동영상 음소거 상태: ${homeVideo.muted}`);
+        console.log(`🔇 [SYNC] 현재 배경음악 상태: ${isMusicEnabled}`);
+        console.log(`🔇 [SYNC] backgroundAudio 객체: ${!!backgroundAudio}`);
+        
+        // 홈 동영상이 음소거되어 있으면 배경 음악과 음성 가이드도 끄기
+        if (homeVideo.muted) {
+          // 배경 음악 비활성화
+          if (isMusicEnabled && backgroundAudio) {
+            backgroundAudio.pause();
+            isMusicEnabled = false;
+            console.log('🔇 홈 동영상 음소거에 따라 배경 음악 비활성화');
+          }
           
-          // 홈 동영상이 음소거되어 있으면 배경 음악과 음성 가이드도 끄기
-          if (homeVideo.muted) {
-            // 배경 음악 비활성화
-            if (isMusicEnabled) {
-              backgroundAudio.pause();
-              isMusicEnabled = false;
-              console.log('🔇 홈 동영상 음소거에 따라 배경 음악 비활성화');
+          // 음성 가이드도 비활성화
+          if (isVoiceEnabled) {
+            isVoiceEnabled = false;
+            if (isVoicePlaying && typeof stopVoice === 'function') {
+              stopVoice();
             }
+            console.log('🔇 홈 동영상 음소거에 따라 음성 가이드 비활성화');
+          }
+        } else {
+          // 홈 동영상 소리가 켜져 있으면 배경 음악과 음성 가이드도 켜기
+          if (!isMusicEnabled && backgroundAudio) {
+            isMusicEnabled = true;
             
-            // 음성 가이드도 비활성화
-            if (isVoiceEnabled) {
-              isVoiceEnabled = false;
-              if (isVoicePlaying) {
-                stopVoice();
-              }
-              console.log('🔇 홈 동영상 음소거에 따라 음성 가이드 비활성화');
-            }
-          } else {
-            // 홈 동영상 소리가 켜져 있으면 배경 음악과 음성 가이드도 켜기
-            if (!isMusicEnabled) {
-              isMusicEnabled = true;
-              backgroundAudio.play().then(() => {
-                console.log('🔊 홈 동영상 재생에 따라 배경 음악 활성화');
-              }).catch(error => {
-                console.warn('배경 음악 재생 실패:', error);
-              });
-            }
-            
-            // 음성 가이드도 활성화
-            if (!isVoiceEnabled) {
-              isVoiceEnabled = true;
-              console.log('🔊 홈 동영상 재생에 따라 음성 가이드 활성화');
-            }
+            // 배경음악 재생 (안전한 비동기 처리)
+            backgroundAudio.play().then(() => {
+              console.log('🔊 홈 동영상 재생에 따라 배경 음악 활성화');
+            }).catch(error => {
+              console.warn('🔊 배경 음악 재생 실패:', error);
+              // 실패해도 상태는 유지
+            });
+          }
+          
+          // 음성 가이드도 활성화
+          if (!isVoiceEnabled) {
+            isVoiceEnabled = true;
+            console.log('🔊 홈 동영상 재생에 따라 음성 가이드 활성화');
           }
         }
+        
         return isMusicEnabled;
       }
 

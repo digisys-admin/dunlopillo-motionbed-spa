@@ -689,15 +689,15 @@ class MotionBedApp {
         }
       }, 1500); // 페이지 로딩 후 1.5초 뒤 자동 진행 시작
       
-      // FastImageOptimizer로 다음 페이지 이미지 프리로드
-      if (window.fastImageOptimizer && typeof window.fastImageOptimizer.preloadNextPageImages === 'function') {
-        window.fastImageOptimizer.preloadNextPageImages(screenName);
-      }
+      // FastImageOptimizer로 다음 페이지 이미지 프리로드 - 임시 비활성화
+      // if (window.fastImageOptimizer && typeof window.fastImageOptimizer.preloadNextPageImages === 'function') {
+      //   window.fastImageOptimizer.preloadNextPageImages(screenName);
+      // }
       
-      // 배경 이미지 폴백 처리
-      if (window.fastImageOptimizer && typeof window.fastImageOptimizer.setupBackgroundImageFallback === 'function') {
-        window.fastImageOptimizer.setupBackgroundImageFallback();
-      }
+      // 배경 이미지 폴백 처리 - 임시 비활성화
+      // if (window.fastImageOptimizer && typeof window.fastImageOptimizer.setupBackgroundImageFallback === 'function') {
+      //   window.fastImageOptimizer.setupBackgroundImageFallback();
+      // }
       
       this._logInfo('페이지 네비게이션 완료', {
         from: previousScreen,
@@ -764,18 +764,29 @@ class MotionBedApp {
 
     // 홈 화면 특별 처리
     if (screenData.type === 'main') {
+      console.time('🎯 홈 화면 렌더링');
       this._appContainer.className = 'screen-container home-screen';
       this._appContainer.innerHTML = this._generateHomeContent();
+      
+      // 홈 화면 시작 버튼 이벤트 리스너 추가
+      this._setupHomeEvents();
+      console.timeEnd('🎯 홈 화면 렌더링');
     } else {
+      console.time(`🎯 ${this._currentScreen} 렌더링`);
       this._appContainer.className = 'screen-container';
       this._appContainer.innerHTML = screenData.content;
+      console.timeEnd(`🎯 ${this._currentScreen} 렌더링`);
     }
 
+    console.time('🖼️ 이미지 설정');
     // 이미지 기본 속성만 설정 (최적화 일시 비활성화)
     this._setupBasicImageAttributes();
+    console.timeEnd('🖼️ 이미지 설정');
     
+    console.time('⚡ 프리로딩');
     // 다음 페이지 이미지 프리로딩
     this._preloadNextPageImages();
+    console.timeEnd('⚡ 프리로딩');
   }
 
   /**
@@ -842,6 +853,10 @@ class MotionBedApp {
    * @private
    */
   _preloadNextPageImages() {
+    // 임시로 프리로딩 비활성화 - 렌더링 속도 테스트
+    console.log('⚡ 프리로딩 비활성화됨');
+    return;
+    
     const currentIndex = APP_CONSTANTS.PAGE_ORDER.indexOf(this._currentScreen);
     let nextPageKey = null;
 
@@ -884,7 +899,7 @@ class MotionBedApp {
             loading="lazy"
           />
           <div class="motion-bed" style="z-index: 6;">MOTION BED</div>
-          <div class="buttons" onclick="next();" style="z-index: 6;">
+          <div class="buttons home-start-button" style="z-index: 6; cursor: pointer;">
             <div class="label">화면을 터치하시면 체험이 시작됩니다</div>
           </div>
         </div>
@@ -999,6 +1014,46 @@ class MotionBedApp {
   _setupHomeEvents() {
     // 간단한 동영상 설정
     this._setupSimpleHomeVideo();
+    
+    // 홈 화면 터치/클릭으로 다음 페이지 이동
+    const homeContent = this._appContainer?.querySelector('.home-content');
+    const startButton = this._appContainer?.querySelector('.home-start-button');
+    
+    if (homeContent) {
+      // 홈 화면 전체에 클릭 이벤트 추가
+      homeContent.addEventListener('click', (e) => {
+        // 소리 토글 버튼과 전체화면 버튼은 제외
+        if (e.target.id === 'soundToggle' || e.target.id === 'fullscreenToggle' || 
+            e.target.closest('#soundToggle') || e.target.closest('#fullscreenToggle')) {
+          return;
+        }
+        
+        console.log('🖱️ 홈 화면 클릭 - 다음 페이지로 이동');
+        this.next();
+      }, { signal: this._abortController.signal });
+      
+      // 터치 이벤트도 추가 (모바일 지원)
+      homeContent.addEventListener('touchend', (e) => {
+        // 소리 토글 버튼과 전체화면 버튼은 제외
+        if (e.target.id === 'soundToggle' || e.target.id === 'fullscreenToggle' || 
+            e.target.closest('#soundToggle') || e.target.closest('#fullscreenToggle')) {
+          return;
+        }
+        
+        e.preventDefault(); // 더블탭 등 방지
+        console.log('👆 홈 화면 터치 - 다음 페이지로 이동');
+        this.next();
+      }, { signal: this._abortController.signal });
+    }
+    
+    if (startButton) {
+      // 시작 버튼에도 별도 이벤트 추가
+      startButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // 중복 실행 방지
+        console.log('🚀 시작 버튼 클릭 - 다음 페이지로 이동');
+        this.next();
+      }, { signal: this._abortController.signal });
+    }
   }
 
   /**
@@ -1310,7 +1365,7 @@ class MotionBedApp {
 }
 
 /**
- * 전역 소리 토글 함수 (참고 코드와 동일)
+ * 전역 소리 토글 함수 (개선된 버전)
  */
 function toggleVideoSound(event) {
   event.stopPropagation(); // ❗ 부모로 이벤트 전파 방지
@@ -1318,20 +1373,45 @@ function toggleVideoSound(event) {
   const video = document.getElementById("homeBackgroundVideo");
   const icon = document.getElementById("soundToggle");
 
+  if (!video) {
+    console.warn('🔊 홈 동영상 요소를 찾을 수 없습니다');
+    return;
+  }
+
+  if (!icon) {
+    console.warn('🔊 사운드 토글 버튼을 찾을 수 없습니다');
+    return;
+  }
+
+  console.log(`🔊 [DEBUG] 현재 동영상 음소거 상태: ${video.muted}`);
+
   if (video.muted) {
+    // 음소거 해제
     video.muted = false;
-    video.play(); // ✅ 참고 코드에 있는 중요한 부분
-    icon.textContent = "🔊";
     
-    // 배경 음악도 함께 활성화
-    if (window.backgroundMusicSystem?.syncWithHomeVideo) {
-      window.backgroundMusicSystem.syncWithHomeVideo();
-    }
+    // 동영상 재생 (비동기 처리)
+    video.play().then(() => {
+      console.log('🔊 홈 동영상 재생 시작');
+      icon.textContent = "🔊";
+      
+      // 배경 음악도 함께 활성화 (약간의 지연 후)
+      setTimeout(() => {
+        if (window.backgroundMusicSystem?.syncWithHomeVideo) {
+          window.backgroundMusicSystem.syncWithHomeVideo();
+        }
+      }, 100);
+    }).catch(error => {
+      console.warn('🔊 홈 동영상 재생 실패:', error);
+      // 실패해도 아이콘은 업데이트
+      icon.textContent = "🔊";
+    });
   } else {
+    // 음소거 설정
     video.muted = true;
     icon.textContent = "🔇";
+    console.log('🔇 홈 동영상 음소거');
     
-    // 배경 음악도 함께 비활성화
+    // 배경 음악도 함께 비활성화 (즉시)
     if (window.backgroundMusicSystem?.syncWithHomeVideo) {
       window.backgroundMusicSystem.syncWithHomeVideo();
     }
@@ -1345,20 +1425,22 @@ function initializeApp() {
   // DOM이 준비되면 앱 시작
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      // FastImageOptimizer 초기화
-      if (typeof FastImageOptimizer !== 'undefined') {
-        window.fastImageOptimizer = new FastImageOptimizer();
-        console.log('FastImageOptimizer 초기화 완료');
-      }
+      // FastImageOptimizer 초기화 - 임시 비활성화
+      // if (typeof FastImageOptimizer !== 'undefined') {
+      //   window.fastImageOptimizer = new FastImageOptimizer();
+      //   console.log('FastImageOptimizer 초기화 완료');
+      // }
+      console.log('FastImageOptimizer 비활성화됨 - 성능 테스트');
       
       MotionBedApp.getInstance();
     });
   } else {
-    // FastImageOptimizer 초기화
-    if (typeof FastImageOptimizer !== 'undefined') {
-      window.fastImageOptimizer = new FastImageOptimizer();
-      console.log('FastImageOptimizer 초기화 완료');
-    }
+    // FastImageOptimizer 초기화 - 임시 비활성화
+    // if (typeof FastImageOptimizer !== 'undefined') {
+    //   window.fastImageOptimizer = new FastImageOptimizer();
+    //   console.log('FastImageOptimizer 초기화 완료');
+    // }
+    console.log('FastImageOptimizer 비활성화됨 - 성능 테스트');
     
     MotionBedApp.getInstance();
   }

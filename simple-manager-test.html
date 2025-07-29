@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 매니저 테스트</title>
+</head>
+<body>
+    <h1>간단한 매니저 테스트</h1>
+    <div id="result"></div>
+    <button onclick="testManager()">매니저 테스트</button>
+
+    <script>
+        function log(message) {
+            document.getElementById('result').innerHTML += message + '<br>';
+            console.log(message);
+        }
+        
+        log('페이지 로드됨');
+    </script>
+    
+    <script src="simple-survey-manager.js"></script>
+    
+    <script>
+        function testManager() {
+            log('=== 매니저 테스트 ===');
+            log('typeof SurveyDataManager: ' + typeof SurveyDataManager);
+            log('typeof window.SurveyDataManager: ' + typeof window.SurveyDataManager);
+            log('typeof window.surveyDataManager: ' + typeof window.surveyDataManager);
+            
+            if (window.surveyDataManager) {
+                try {
+                    const status = window.surveyDataManager.getSystemStatus();
+                    log('✅ getSystemStatus 성공: ' + status.tabletId);
+                } catch (error) {
+                    log('❌ getSystemStatus 실패: ' + error.message);
+                }
+            }
+        }
+        
+        setTimeout(() => {
+            log('=== 자동 테스트 (1초 후) ===');
+            testManager();
+        }, 1000);
+    </script>
+</body>
+</html>

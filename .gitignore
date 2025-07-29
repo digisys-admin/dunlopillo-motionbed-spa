@@ -25,3 +25,6 @@ build/
 # IDE 설정
 .vscode/settings.json
 .idea/
+
+# Local Netlify folder
+.netlify

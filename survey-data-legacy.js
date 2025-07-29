@@ -1,10 +1,9 @@
 /**
  * ========================================
- * DUNLOPILLO MOTIONBED SPA - SURVEY DATA (새버전)
+ * DUNLOPILLO MOTIONBED SPA - SURVEY DATA MANAGER (통합 버전)
  * ========================================
  * 
  * Google Sheets 연동 설문조사 데이터 수집 시스템
- * survey-data-manager.js와 연동하여 작동
  * 
  * @author Development Team
  * @version 3.0.0 - Google Sheets Integration
@@ -16,6 +15,7 @@
 /**
  * 레거시 호환성을 위한 설문 데이터 관리자
  * 새로운 SurveyDataManager와 연동하여 작동
+ * @class LegacySurveyData
  */
 class LegacySurveyData {
   constructor() {
@@ -153,7 +153,7 @@ class LegacySurveyData {
 
   /**
    * 별점 저장
-   * @param {string|number} pageType - 페이지 유형 (5, 8, 12, 18) 또는 페이지명 (page5, page8, page12, page18)
+   * @param {string} pageType - 페이지 유형 (5, 8, 12, 18)
    * @param {number} rating - 별점 (1-5)
    * @returns {Promise<boolean>}
    */
@@ -164,8 +164,8 @@ class LegacySurveyData {
         return false;
       }
 
-      // 페이지 타입을 새로운 형식으로 변환 (이미 page가 붙어있으면 그대로 사용)
-      const page = pageType.toString().startsWith('page') ? pageType : `page${pageType}`;
+      // 페이지 타입을 새로운 형식으로 변환
+      const page = `page${pageType}`;
       this._manager.saveRating(page, rating);
       console.log(`⭐ [LegacySurveyData] 별점 저장: ${page} = ${rating}점`);
       return true;

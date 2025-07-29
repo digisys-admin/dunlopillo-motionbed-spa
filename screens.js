@@ -194,8 +194,8 @@ const LOCAL_IMAGES = {
   P15_PIC1: 'assets/pics/p15_pic1.png',
   P15_REMOTE: 'assets/pics/p15_remote.png',
   P16_PIC1: 'assets/pics/p16_pic1.png',
-  P16_HAND1: 'assets/pics/p16_hand1.png',
-  P16_HAND2: 'assets/pics/p16_hand2.png',
+  P16_HAND1: 'assets/pics/p16-hand1.png',
+  P16_HAND2: 'assets/pics/p16-hand2.png',
   P17_REMOTE: 'assets/pics/p17_remote.png',
   P19_PIC1: 'assets/pics/p19_pic1.png'
 };
@@ -211,22 +211,20 @@ const LOCAL_VIDEOS = {
 // 스마트 이미지 소스 선택 (Progressive Loading + 폴백 기능)
 function createSmartImageSource(googleDriveUrls, localUrl) {
   const imageSource = {
-    // 즉시 표시용 썸네일 (가장 빠름)
+    // Google Drive URLs (백업용으로 유지)
     thumbnail: googleDriveUrls.thumbnail,
-    // 고화질 이미지 (백그라운드 로드)
     fullsize: googleDriveUrls.fullsize, 
-    // 직접 접근 URL (가장 안정적)
     direct: googleDriveUrls.direct,
-    // 로컬 폴백
+    // 로컬 URL (우선 사용)
     fallback: localUrl,
     
-    // Progressive Loading 전략
+    // Progressive Loading 전략 - 로컬 우선
     toString: function() {
-      // 기본적으로는 가장 빠른 썸네일 반환
-      return this.thumbnail;
+      // 빠른 로딩을 위해 로컬 이미지를 우선 반환
+      return this.fallback;
     },
     
-    // 고화질 이미지 URL 반환
+    // Google Drive 고화질 이미지 URL 반환 (필요시)
     getFullsize: function() {
       return this.fullsize;
     },
@@ -296,13 +294,13 @@ class FastImageOptimizer {
   }
 
   init() {
-    // 즉시 중요 이미지들 프리로드 (썸네일)
-    this.preloadCriticalThumbnails();
+    // 임시로 프리로딩 비활성화 - 렌더링 속도 테스트
+    // this.preloadCriticalThumbnails();
     
-    // 백그라운드에서 고화질 이미지 로드
-    setTimeout(() => this.upgradeToHighQuality(), 2000);
+    // 백그라운드에서 고화질 이미지 로드 - 비활성화
+    // setTimeout(() => this.upgradeToHighQuality(), 2000);
     
-    console.log('🚀 Progressive FastImageOptimizer 초기화 완료');
+    console.log('🚀 Progressive FastImageOptimizer 초기화 완료 (프리로딩 비활성화)');
   }
 
   // 즉시 로드 - 빠른 썸네일 버전
@@ -1488,6 +1486,13 @@ const screens = {
       </div>
     `
   },
+  
+  // 홈 화면 정의
+  home: {
+    type: 'main',
+    title: 'Dunlopillo Motion Bed',
+    content: '' // script.js에서 동적으로 생성
+  }
 };
 
 // 전역 객체로 노출 (script.js에서 접근 가능)
