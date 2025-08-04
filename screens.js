@@ -718,7 +718,7 @@ const screens = {
               <div class="ROYAL-MOTION">ROYAL<br />MOTION</div>
             </div>
             <div class="text-wrapper-2">던롭필로에<br />오신걸 환영해요.</div>
-            <p class="p">던롭필로는 모션베드 튜토리얼을 제공하고<br />경험을 모아 최고의 수면을 제공합니다.</p>
+            <p class="p">던롭필로는 모션베드 튜토리얼을<br /> 제공하고 경험을 모아 최고의<br /> 수면을 제공합니다.</p>
           </div>
           <div class="overlap-2">
             <div class="text-wrapper-3">성별을 선택해주세요.</div>
@@ -759,17 +759,17 @@ const screens = {
             <div class="page2-overlap-2">
               <div class="page2-ellipse"></div>
               <img class="page2-version" src="${IMG.LOGO}" onerror="this.src='${LOCAL_IMAGES.LOGO}'" />
-              <p class="page2-intro-text">던롭필로는 모션베드 튜토리얼을 제공하고<br />경험을 모아 최고의 수면을 제공합니다.</p>
+              <p class="page2-intro-text" style="position: absolute !important; top: 394px !important; left: 1080px !important; font-size: 20px !important; text-align: center !important; line-height: 28px !important; color: black !important; height: auto !important;">던롭필로는 모션베드 튜토리얼을 <br />제공하고 경험을 모아 <br />최고의 수면을 제공합니다.</p>
               <div class="page2-rectangle"></div>
               <div class="page2-rectangle-2"></div>
-              <p class="page2-okin-text">던롭필로의 모션베드는 세계 최대의<br />모션베드 제조사 에르고모션에서 <br />제작됩니다.<br /><br />독일 OKIN사의 전용 모터를 통해<br />정전 시에도 안전합니다.</p>
+              <p class="page2-okin-text">던롭필로의 모션베드는<br />세계 최대의 모션베드 제조사<br />에르고모션에서 제작됩니다.<br /><br />독일 OKIN사의 전용 모터를<br /> 통해 정전 시에도 안전합니다.</p>
               <img class="page2-group" src="${IMG.PAGE2_GROUP}" onerror="this.src='${LOCAL_IMAGES.PAGE2_GROUP}'" />
             </div>
             <div class="page2-title-main">왜 던롭필로 모션베드여야 할까요?</div>
             <div class="page2-title-sub">모션베드 특장점</div>
           </div>
           <div class="page2-overlap-3">
-            <p class="page2-kg-text">튼튼한 스틸 프레임과 유칼립투스 합판으로<br />제작되어 뒤틀림과 변형 걱정이 없고,<br /><br />340kg까지 견딜 수 있는 높은 내구성과<br />안정성을 자랑합니다.</p>
+            <p class="page2-kg-text">튼튼한 스틸 프레임과<br />유칼립투스 합판으로 제작되어<br />뒤틀림과 변형 걱정이 없고,<br /><br />340kg까지 견딜 수 있는<br />높은 내구성과 안정성을 자랑합니다.</p>
             <img class="page2-bed-img" src="${IMG.PAGE2_BED}" onerror="this.src='${LOCAL_IMAGES.PAGE2_BED}'" style="border-radius: 15px; box-shadow: 2px 3px 6px 2px #00000040;" />
           </div>
         </div>
@@ -911,9 +911,7 @@ const screens = {
             <p class="page6-text-1">
               연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.<br />
               <span style="white-space: nowrap;">다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.</span><br />
-            </p>
-            <p class="page6-text-2">
-              이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면 부종이 완화되거나 <br />허리/어깨가 편해지는 것을 느끼실 수 있습니다.<br />
+              <br /> 이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면 부종이 완화되거나 <br />허리/어깨가 편해지는 것을 느끼실 수 있습니다.<br />
             </p>
           </div>
         </div>
@@ -1023,12 +1021,10 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              실제로 많은 분들이 주무실 때, 코가 조금 막히거나 코골이를 심하게 하시는 경우가 있는데요.</span><br />
-              이 때 모션베드를 통해 머리를 조금 올려 기도를 확보하면 숨쉬기 편해지고<br />
-              코골이나 무호흡증 또한 완화될 수 있습니다.
-            </p>
-            <p class="page6-text-2">
-            <br />
+              실제로 많은 분들이 코가 막히거나 코골이를 심하게 하시는 경우가 있는데요.<br />
+              이 때 모션베드를 머리를 조금 올려 기도를 확보하면 숨쉬기 편해지고<br />
+              <br />
+              코골이나 무호흡증 또한 완화될 수 있습니다.<br />
               또한 역류성 식도염도 완화되는 효과를 보실 수 있습니다.
             </p>
           </div>
@@ -1087,7 +1083,7 @@ const screens = {
         
         <p class="page7-title">라텍스 매트리스 &amp; 모션베드 체험</p>
         
-        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 2분간 편하게 사용해주세요.</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 1분간 편하게 사용해주세요.</p>
       </div>
     `
   },

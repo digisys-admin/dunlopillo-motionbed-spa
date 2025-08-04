@@ -26,6 +26,7 @@ html {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  background: #2d3748;
 }
 
 *, *:before, *:after {
@@ -65,6 +66,7 @@ body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
+  background: #2d3748;
 }
 
 ol, ul {
@@ -261,6 +263,12 @@ a {
   
   /* 레이아웃 크기 */
   --screen-width: 1280px;
+  --screen-height: 800px;
+  
+  /* 전체화면 최적화 변수 */
+  --fullscreen-scale: 1;
+  --target-width: 1280px;
+  --target-height: 800px;
   --screen-height: 800px;
   --card-width: 268px;
   --card-height: 355px;
@@ -668,12 +676,13 @@ body {
   margin-top: -1.25px;
   margin-right: -16.92px;
   font-family: var(--font-regular);
-  font-weight: 400;
+  font-weight: 500;
   color: var(--black);
   font-size: 24px;
   text-align: center;
   letter-spacing: -1.68px;
   line-height: normal;
+  
 }
 
 /* ==== PAGE1 - 인적사항 입력 페이지 독립 스타일 ==== */
@@ -740,11 +749,11 @@ body {
   position: absolute;
   height: 50px;
   top: 323px;
-  left: 31px;
+  left: 15px;
   font-family: var(--font-light);
-  font-weight: 300;
+  font-weight: 500;
   color: var(--black);
-  font-size: 16px;
+  font-size: 22px;
   text-align: center;
   letter-spacing: -0.80px;
   line-height: 24.8px;
@@ -754,6 +763,8 @@ body {
 .page1-content .element .overlap-2 {
   width: 297px;
   height: 239px;
+  font-size: 20px;
+  font-weight: 500;
   top: 442px;
   left: 495px;
 }
@@ -780,6 +791,7 @@ body {
   gap: 19px;
   padding: 10px 90px;
   left: 35px;
+  font-weight: 500;
 }
 
 .page1-content .element .view {
@@ -797,7 +809,7 @@ body {
   top: 183px;
   left: 495px;
 }
-
+/* page1 사용여부 설문 */
 .page1-content .element .text-wrapper-4 {
   position: absolute;
   height: 24px;
@@ -867,6 +879,7 @@ body {
   border-radius: var(--option-radius);
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-weight: 500;
 }
 
 .page1-content .element .view:hover,
@@ -946,15 +959,16 @@ body {
   position: relative;
   width: fit-content;
   margin-top: -1.25px;
-  margin-right: -16.92px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .page1-content .element .label-2 {
-  margin-left: -9.50px;
-  margin-right: -9.50px;
   position: relative;
   width: fit-content;
   margin-top: -1.00px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* 연령 선택 버튼들 - 공통 클래스 적용 */
@@ -965,9 +979,9 @@ body {
 .page1-content .element .view-5,
 .page1-content .element .view-6,
 .page1-content .element .view-7 {
-  width: 100px;
+  width: 80px;
   gap: 19px;
-  padding: 3px 72px;
+  padding: 3px 50px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -1007,6 +1021,24 @@ body {
 .page1-content .element .label-6 {
   margin-left: -51.00px;
   margin-right: -51.00px;
+}
+
+/* Page1 성별 및 경험 라벨 텍스트에 font-weight: 500 및 중앙 정렬 적용 */
+.page1-content .element .label,
+.page1-content .element .label-2 {
+  font-weight: 500 !important;
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+}
+
+/* Page1 연령대 라벨 텍스트에는 font-weight: 500만 적용 (기존 정렬 유지) */
+.page1-content .element .label-3,
+.page1-content .element .label-4,
+.page1-content .element .label-5,
+.page1-content .element .label-6 {
+  font-weight: 500 !important;
 }
 
 /* ==== PAGE2 - 모션베드 특장점 페이지 (Anima 코드 기반) ==== */
@@ -1060,18 +1092,24 @@ body {
   object-fit: cover;
 }
 
-.page2-intro-text {
-  position: absolute;
-  height: 50px;
-  top: 394px;
-  left: 1080px;
-  font-family: "Pretendard", Helvetica;
-  font-weight: 400;
-  color: #000000;
-  font-size: 16px;
-  text-align: center;
-  letter-spacing: -0.80px;
-  line-height: 24.8px;
+/* 더 구체적인 선택자로 우선순위 높이기 */
+.page2-content .page2-intro-text,
+p.page2-intro-text {
+  position: absolute !important;
+  height: auto !important;
+  top: 394px !important;
+  left: 1080px !important;
+  font-family: "Pretendard", Helvetica !important;
+  font-weight: 400 !important;
+  color: #000000 !important;
+  font-size: 20px !important;
+  text-align: center !important;
+  letter-spacing: -0.80px !important;
+  line-height: 28px !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  display: block !important;
+  width: 200px !important; /* 너비 제한으로 줄바꿈 강제 */
 }
 
 .page2-rectangle {
@@ -1102,9 +1140,9 @@ body {
   top: 582px;
   left: 1055px;
   font-family: "Pretendard", Helvetica;
-  font-weight: 400;
+  font-weight: 500;
   color: #000000;
-  font-size: 18px;
+  font-size: 20px;
   text-align: center;
   letter-spacing: -0.80px;
   line-height: 26px;
@@ -1165,9 +1203,9 @@ body {
   top: 264px;
   left: 10px;
   font-family: "Pretendard", Helvetica;
-  font-weight: 400;
+  font-weight: 500;
   color: #000000;
-  font-size: 18px;
+  font-size: 20px;
   text-align: center;
   letter-spacing: -0.80px;
   line-height: 24.8px;
@@ -1930,53 +1968,40 @@ body {
 
 .page6-content-group {
   position: relative;
-  width: 635px; /* 기존 사이즈 유지 */
-  height: 180px; /* 기존 160px에서 20px 증가 - page9 텍스트 겹침 방지 */
-  top: 20px; /* 기존 위치 유지 */
-  left: 34px; /* 기존 위치 유지 */
-  text-align: left; /* 전체 그룹 왼쪽 정렬 */
+  width: 635px;
+  height: 180px;
+  top: 18px;
+  left: 34px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 정렬 */
+  align-items: flex-start; /* 왼쪽 정렬 유지 */
 }
 
 .page6-text-1 {
-  position: absolute;
-  height: 85px; /* 기존 62px에서 23px 증가 - 더 많은 텍스트 수용 */
-  top: 0;
-  left: -12px;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 22px; /* 기존 폰트 크기 유지 */
-  letter-spacing: -2.00px; /* 기존 자간 유지 */
-  line-height: 30.6px; /* 기존 줄간격 유지 */
+  font-size: 22px;
+  letter-spacing: -2.00px;
+  line-height: 30.6px;
+  text-align: left;
+  width: 100%;
   margin: 0;
-  padding: 0; /* 패딩 제거 */
-  width: 100%; /* 전체 너비 사용 */
-  overflow: visible; /* 오버플로우 허용으로 변경 */
-  white-space: normal; /* 줄바꿈 허용으로 변경 */
-  text-align: left !important; /* 강제 왼쪽 정렬 */
-  text-indent: 0 !important; /* 들여쓰기 제거 */
-  direction: ltr; /* 왼쪽에서 오른쪽 방향 명시 */
+  padding: 0;
 }
 
 .page6-text-2 {
-  position: absolute;
-  height: 85px; /* 기존 높이 유지 */
-  top: 95px; /* 기존 85px에서 10px 더 아래로 - 겹침 방지 */
-  left: -12px;
   font-family: "Pretendard-Medium", Helvetica;
   font-weight: 500;
   color: var(--black);
-  font-size: 22px; /* 기존 폰트 크기 유지 */
-  letter-spacing: -2.00px; /* 기존 자간 유지 */
-  line-height: 30.6px; /* 기존 줄간격 유지 */
+  font-size: 22px;
+  letter-spacing: -2.00px;
+  line-height: 30.6px;
+  text-align: left;
+  width: 100%;
   margin: 0;
-  padding: 0; /* 패딩 제거 */
-  width: 100%; /* 전체 너비 사용 */
-  overflow: visible; /* 오버플로우 허용 */
-  white-space: normal; /* 줄바꿈 허용 */
-  text-align: left !important; /* 강제 왼쪽 정렬 */
-  text-indent: 0 !important; /* 들여쓰기 제거 */
-  direction: ltr; /* 왼쪽에서 오른쪽 방향 명시 */
+  padding: 0;
 }
 
 .page6-tip-label {
@@ -2011,30 +2036,26 @@ body {
   .page6-content-group {
     left: 20px !important;
     width: calc(100% - 40px) !important;
-    text-align: left !important;
-    height: 200px !important; /* 모바일에서도 높이 증가 */
+    height: 200px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
   }
   
-  .page6-text-1,
-  .page6-text-2 {
+  .page6-text-1 {
+    position: static !important;
+    font-family: "Pretendard-Medium", Helvetica !important;
+    font-weight: 500 !important;
+    color: var(--black) !important;
+    font-size: 22px !important;
+    letter-spacing: -2.00px !important;
+    line-height: 30.6px !important;
     text-align: left !important;
-    text-indent: 0 !important;
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-    direction: ltr !important;
-    word-break: keep-all !important;
-    word-wrap: break-word !important;
-    letter-spacing: -1.5px !important; /* 자간 조정 */
-    line-height: 28px !important; /* 줄간격 약간 줄임 */
     width: 100% !important;
-    left: 0 !important;
-    position: absolute !important;
-    writing-mode: horizontal-tb !important; /* 수평 쓰기 모드 강제 */
-    unicode-bidi: bidi-override !important; /* 텍스트 방향 강제 */
-    text-orientation: mixed !important; /* 텍스트 방향 강제 */
-    display: block !important;
-    float: none !important;
-    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    word-break: keep-all !important;
   }
   
   /* page9 전용 레이아웃 조정 (page6과 동일한 구조 적용) */
@@ -2058,27 +2079,20 @@ body {
     height: 240px !important; /* page9는 텍스트가 더 길어서 높이 더 증가 */
   }
   
-  .page9 .page6-text-1,
-  .page9 .page6-text-2 {
+  .page9 .page6-text-1 {
+    font-family: "Pretendard-Medium", Helvetica !important;
+    font-weight: 500 !important;
+    color: var(--black) !important;
+    font-size: 17px !important;
+    letter-spacing: -1.5px !important;
+    line-height: 26px !important;
     text-align: left !important;
-    text-indent: 0 !important;
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-    direction: ltr !important;
-    word-break: keep-all !important;
-    word-wrap: break-word !important;
-    letter-spacing: -1.5px !important; /* 자간 조정 */
-    line-height: 26px !important; /* page9는 줄간격 약간 더 줄임 */
     width: 100% !important;
-    left: 0 !important;
-    position: absolute !important;
-    writing-mode: horizontal-tb !important; /* 수평 쓰기 모드 강제 */
-    unicode-bidi: bidi-override !important; /* 텍스트 방향 강제 */
-    text-orientation: mixed !important; /* 텍스트 방향 강제 */
-    display: block !important;
-    float: none !important;
-    transform: none !important;
-    font-size: 17px !important; /* page9는 글자 크기 약간 더 작게 */
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+    word-break: normal !important;
+    white-space: normal !important;
   }
   
   /* page9에서 절대 위치 요소들 조정 (bottom, right 속성 가진 요소들) */
@@ -2092,8 +2106,7 @@ body {
   }
   
   /* 더 구체적인 셀렉터로 강제 적용 */
-  .page6-element .page6-content-wrapper .page6-content-group .page6-text-1,
-  .page6-element .page6-content-wrapper .page6-content-group .page6-text-2 {
+  .page6-element .page6-content-wrapper .page6-content-group .page6-text-1 {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
@@ -2362,7 +2375,7 @@ body {
 }
 
 /* ==== 완전한 전체화면 모드 스타일 ==== */
-/* 브라우저 상단 흰색 여백 완전 제거 */
+/* 브라우저 파란색/흰색 여백 완전 제거 */
 html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fullscreen {
   width: 100vw !important;
   height: 100vh !important;
@@ -2373,8 +2386,11 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   border: none !important;
   outline: none !important;
+  box-sizing: border-box !important;
 }
 
 :fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
@@ -2387,8 +2403,11 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   border: none !important;
   outline: none !important;
+  box-sizing: border-box !important;
 }
 
 :fullscreen body, :-webkit-full-screen body, :-moz-full-screen body, :-ms-fullscreen body {
@@ -2401,25 +2420,34 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   border: none !important;
   outline: none !important;
+  box-sizing: border-box !important;
 }
 
 :fullscreen .screen-container, :-webkit-full-screen .screen-container, :-moz-full-screen .screen-container, :-ms-fullscreen .screen-container {
-  width: 100vw !important;
-  height: 100vh !important;
+  /* 태블릿 1280px 기준 비율 유지하면서 스케일링 */
+  width: 1280px !important;
+  height: 800px !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: none !important;
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
   background: #2d3748 !important;
   border: none !important;
   outline: none !important;
   box-sizing: border-box !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  
+  /* 화면 크기에 맞게 비율 유지하면서 스케일링 */
+  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
+  transform-origin: center center !important;
 }
 
 /* 🎯 테블릿 전체화면 특별 최적화 */
@@ -2503,16 +2531,19 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
 }
 
 :-webkit-full-screen .screen-container {
-  width: 100vw !important;
-  height: 100vh !important;
+  width: var(--target-width) !important;
+  height: var(--target-height) !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: none !important;
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
+  transform-origin: center center !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Firefox */
@@ -2532,16 +2563,19 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
 }
 
 :-moz-full-screen .screen-container {
-  width: 100vw !important;
-  height: 100vh !important;
+  width: var(--target-width) !important;
+  height: var(--target-height) !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: none !important;
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
+  transform-origin: center center !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 /* MS Edge/IE */
@@ -2561,16 +2595,19 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
 }
 
 :-ms-fullscreen .screen-container {
-  width: 100vw !important;
-  height: 100vh !important;
+  width: var(--target-width) !important;
+  height: var(--target-height) !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: none !important;
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
+  transform-origin: center center !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 /* ==== 태블릿 전체화면/볼륨 버튼 최적화 ==== */
@@ -2636,16 +2673,57 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
 
 /* 전체화면 모드 클래스 기반 스타일 */
 body.fullscreen-mode {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #2d3748 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  box-sizing: border-box !important;
 }
 
 body.fullscreen-mode .screen-container {
-  width: 100vw;
-  height: 100vh;
+  /* 1280x800 기준 비율을 유지하면서 화면 크기에 맞게 스케일링 */
+  width: 1280px !important;
+  height: 800px !important;
   border-radius: 0;
   box-shadow: none;
+  
+  /* 중앙 정렬을 위한 절대 위치 */
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  
+  /* 좌우 여백 완전 제거 */
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* 1280x800 콘텐츠를 화면에 맞게 스케일링하고 중앙 정렬 */
+  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
+  transform-origin: center center !important;
+  
+  display: block !important;
+  overflow: hidden !important;
+  z-index: 1000 !important;
+}
+
+/* 전체화면 모드에서 모든 콘텐츠 중앙 정렬 */
+body.fullscreen-mode .screen-container * {
+  /* 콘텐츠도 함께 스케일되도록 강제 적용 */
+  transform-origin: center center !important;
+}
+
+/* 전체화면 모드에서 개별 요소들도 스케일 적용 */
+body.fullscreen-mode .page-content,
+body.fullscreen-mode .screen,
+body.fullscreen-mode .content,
+body.fullscreen-mode .container {
+  transform-origin: center center !important;
 }
 
 /* ==== 모바일 전체화면/볼륨 버튼 최적화 ==== */
@@ -2680,4 +2758,52 @@ body.fullscreen-mode .screen-container {
 }
 
 /* ==== 📱 전체화면 최적화 스타일 ==== */
-/* 기본 전체화면 스타일만 유지 */
+/* 브라우저 파란색/흰색 여백 완전 제거 - 최종 강화 */
+
+/* 모든 가능한 전체화면 선택자에 대해 완벽한 배경 제거 */
+html:fullscreen,
+html:-webkit-full-screen,
+html:-moz-full-screen,
+html:-ms-fullscreen,
+*:fullscreen,
+*:-webkit-full-screen,
+*:-moz-full-screen,
+*:-ms-fullscreen {
+  background: #2d3748 !important;
+  background-color: #2d3748 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* 브라우저 기본 전체화면 여백 완전 제거 */
+html:fullscreen::backdrop,
+html:-webkit-full-screen::backdrop,
+html:-moz-full-screen::backdrop,
+html:-ms-fullscreen::backdrop,
+*:fullscreen::backdrop,
+*:-webkit-full-screen::backdrop,
+*:-moz-full-screen::backdrop,
+*:-ms-fullscreen::backdrop {
+  background: #2d3748 !important;
+  background-color: #2d3748 !important;
+}
+
+/* Safari 전용 전체화면 배경 제거 */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  html:fullscreen,
+  html:-webkit-full-screen {
+    background: #2d3748 !important;
+    background-color: #2d3748 !important;
+  }
+}
