@@ -175,6 +175,7 @@ const GOOGLE_DRIVE_VIDEOS = {
 const LOCAL_IMAGES = {
   LOGO: 'assets/pics/dunlopillo_logo.png',
   LOGO_WHITE: 'assets/pics/dunlopillo_logo_white.png',
+  HOME_ICON: 'assets/pics/home-icon.png',
   PAGE2_GROUP: 'assets/pics/p2_pic1.png',
   PAGE2_BED: 'assets/pics/p2_bed.png',
   P3_PIC1: 'assets/pics/p3_pic1.png',
@@ -248,6 +249,7 @@ const IMG = {
   // 모든 이미지를 로컬 우선으로 사용 (Netlify CDN 활용)
   LOGO: LOCAL_IMAGES.LOGO,
   LOGO_WHITE: LOCAL_IMAGES.LOGO_WHITE,
+  HOME_ICON: LOCAL_IMAGES.HOME_ICON,
   PAGE2_GROUP: LOCAL_IMAGES.PAGE2_GROUP,
   PAGE2_BED: LOCAL_IMAGES.PAGE2_BED,
   P3_PIC1: LOCAL_IMAGES.P3_PIC1,
@@ -659,7 +661,8 @@ const COMMON_ELEMENTS = {
       'page13': 4,
       'page14': 4,
       'page15': 5,
-      'page16': 5,
+      'page16-1': 5,
+      'page16-2': 5,
       'page17': 6,
       'page18': 6
     };
@@ -832,6 +835,7 @@ const screens = {
         </div>
         
         <p class="page4-title">라텍스 매트리스 &amp; 모션베드 체험</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 30초간 편하게 사용해주세요.</p>
       </div>
     `
   },
@@ -944,6 +948,7 @@ const screens = {
         </div>
         
         <p class="page7-title">라텍스 매트리스 &amp; 모션베드 체험</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 30초간 편하게 사용해주세요.</p>
       </div>
     `
   },
@@ -1083,7 +1088,7 @@ const screens = {
         
         <p class="page7-title">라텍스 매트리스 &amp; 모션베드 체험</p>
         
-        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 1분간 편하게 사용해주세요.</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 2분간 편하게 사용해주세요.</p>
       </div>
     `
   },
@@ -1166,6 +1171,7 @@ const screens = {
         </div>
         
         <p class="page7-title">라텍스 매트리스 &amp; 모션베드 체험</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 30초간 편하게 사용해주세요.</p>
       </div>
     `
   },
@@ -1228,24 +1234,25 @@ const screens = {
         </div>
         
         <p class="page7-title">라텍스 매트리스 &amp; 모션베드 체험</p>
+        <p style="position: absolute; height: 45px; top: 701px; left: 404px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 28px; text-align: center; letter-spacing: 0; line-height: 44.8px; white-space: nowrap;">그리고 약 30초간 편하게 사용해주세요.</p>
       </div>
     `
   },
 
-  // page16: 16단계 - 최종 TIP (page14와 동일 구조, 배경 이미지와 텍스트만 변경)
-  'page16': {
+  // page16-1: 16-1단계 - 최종 TIP (page14와 동일 구조, 배경 이미지와 텍스트만 변경)
+  'page16-1': {
     type: 'tip',
     pageTitle: '라텍스 매트리스 & 모션베드 체험',
-    title: '16단계 - 최종 TIP',
+    title: '16-1단계 - 최종 TIP',
     content: `
-      ${COMMON_ELEMENTS.getButtons('page16')}
+      ${COMMON_ELEMENTS.getButtons('page16-1')}
       
       <div class="page6-element" style="background-image: url(${IMG.P16_PIC1}); background-size: cover; background-position: 50% 50%;">
         <img class="page6-version" src="${IMG.LOGO}" onerror="this.src='${LOCAL_IMAGES.LOGO}'" />
         
         <p class="page6-title">라텍스 매트리스 &amp; 모션베드 체험</p>
         
-        ${COMMON_ELEMENTS.getProgressBar('page16')}
+        ${COMMON_ELEMENTS.getProgressBar('page16-1')}
         
         <!-- TIP 라벨 - 기존 글로벌 스타일 적용 -->
         <div style="
@@ -1337,8 +1344,9 @@ const screens = {
               text-indent: 0 !important;
               direction: ltr;
             ">
-              혹시 어딘지 모르게 불편하지는 않으신가요?<br />
-              <span style="white-space: nowrap;">그건 바로 지금까지 모션베드를 체험하면서 몸이 편안한 상태에 적응되었기 때문입니다.</span>
+              손에 힘을 빼 보세요, 긴장감이 풀리고 편안해 지셨죠?<br /> 
+              <span style="white-space: nowrap;">그힘을 뺀 상태가 방금 경험하신 가장 편안한 제로G 상태와 동일한 자세 입니다.</span>
+              
             </p>
             <p style="
               position: absolute;
@@ -1360,8 +1368,89 @@ const screens = {
               text-indent: 0 !important;
               direction: ltr;
             ">
-              던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽히 호환되기에<br />
+              던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽한 조합이기에<br />
               더욱 안정감 있고 편안한 휴식 및 숙면을 취하는 데 도움이 될 거라고 확신합니다.
+            </p>
+          </div>
+        </div>      </div>
+    `
+  },
+
+  // page16-2: 16-2단계 - 최종 TIP 2 (page16-1과 동일 구조)
+  'page16-2': {
+    type: 'tip',
+    pageTitle: '라텍스 매트리스 & 모션베드 체험',
+    title: '16-2단계 - 최종 TIP',
+    content: `
+      ${COMMON_ELEMENTS.getButtons('page16-2')}
+      
+      <div class="page6-element" style="background-image: url(${IMG.P16_PIC1}); background-size: cover; background-position: 50% 50%;">
+        <img class="page6-version" src="${IMG.LOGO}" onerror="this.src='${LOCAL_IMAGES.LOGO}'" />
+        
+        <p class="page6-title">라텍스 매트리스 &amp; 모션베드 체험</p>
+        
+        ${COMMON_ELEMENTS.getProgressBar('page16-2')}
+        
+        <!-- TIP 라벨 - 기존 글로벌 스타일 적용 -->
+        <div style="
+          position: absolute;
+          height: 44px;
+          top: 170px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-family: var(--font-bold);
+          font-weight: 700;
+          color: var(--primary-blue);
+          font-size: 48px;
+          letter-spacing: 0;
+          line-height: 44.2px;
+          white-space: nowrap;
+        ">TIP!</div>
+        
+        <!-- Content Wrapper - page16-2용 텍스트 (손 이미지 위치로 이동) -->
+        <div style="
+          position: absolute;
+          width: 703px;
+          height: 200px;
+          top: 230px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: var(--light-gray);
+          border-radius: 15px;
+          box-shadow: 2px 3px 6px 2px #00000040;
+        ">
+          <div style="
+            position: relative;
+            width: 635px;
+            height: 180px;
+            top: 20px;
+            left: 34px;
+            text-align: left;
+          ">
+            <p style="
+              position: absolute;
+              height: 85px;
+              top: 30px;
+              left: -12px;
+              font-family: var(--font-regular);
+              font-weight: 500;
+              color: var(--black);
+              font-size: 22px;
+              letter-spacing: -2.00px;
+              line-height: 30.6px;
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              overflow: visible;
+              white-space: normal;
+              text-align: left !important;
+              text-indent: 0 !important;
+              direction: ltr;
+            ">
+              실제로 8시간 수면중에 보통 60~80번을 뒤척인다고 하는데요.<br />
+              <span style="white-space: nowrap;">뒤척임에 즉각적으로 받쳐주는 던롭필로 라텍스 매트리스와 모션베드를 함께 사용하시면</span><br />
+              뒤척임이 줄어들어 더욱 편안한 숙면을 경험하실 수 있습니다.<br />
+              
             </p>
           </div>
         </div>      </div>
@@ -1476,9 +1565,7 @@ const screens = {
         
         <div class="page19-main-text" style="position: absolute; height: 90px; top: 160px; left: 494px; font-family: 'Pretendard-Bold', Helvetica; font-weight: 700; color: #18306c; font-size: 32px; text-align: center; letter-spacing: 0; line-height: 44.8px;">설문이 완료되었습니다.<br />감사합니다!</div>
         
-        <button class="page19-home-btn" onclick="goHome()" style="display: flex; width: 97px; align-items: flex-start; justify-content: center; gap: 10px; padding: 10px; position: absolute; top: 274px; left: 592px; background-color: #18306c; border-radius: 15px; border: none; cursor: pointer;">
-          <div style="position: relative; width: fit-content; margin-top: -1px; font-family: 'Pretendard-Regular', Helvetica; font-weight: 400; color: #ffffff; font-size: 24px; text-align: center; letter-spacing: -1.68px; line-height: normal;">홈으로</div>
-        </button>
+        <img src="${IMG.HOME_ICON}" onclick="goHome()" style="position: absolute; top: 274px; left: 592px; cursor: pointer; width: 97px; height: 44px;" alt="홈으로" />
       </div>
     `
   },

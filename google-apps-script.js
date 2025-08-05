@@ -11,8 +11,8 @@
  */
 
 // Google Sheets 설정
-const SPREADSHEET_ID = '1RTjrn7N-q0-uAm2mHn2CMwaU-HobX8FRqvVa37vlpOg'; // 개인 계정의 새 스프레드시트 ID로 변경
-const SHEET_NAME = '설문결과';
+var SPREADSHEET_ID = '1GFuHvgVvVncOljDltXAv3_57TfGdPzKhkzJVGI0T3wE'; // 개인 계정의 새 스프레드시트 ID로 변경
+var SHEET_NAME = '설문결과';
 
 /**
  * GET 요청 처리 함수 (브라우저에서 직접 접근할 때)
@@ -56,10 +56,51 @@ function doGet(e) {
  */
 function doPost(e) {
   try {
-    console.log('POST 요청 수신:', e.postData.contents);
+    console.log('POST 요청 수신:', e);
     
-    // JSON 데이터 파싱
-    const data = JSON.parse(e.postData.contents);
+    let data;
+    
+    // Form 데이터가 있는 경우 (CORS 우회 방식)
+    if (e && e.parameter && e.parameter.data) {
+      console.log('Form 데이터 수신:', e.parameter.data);
+      try {
+        data = JSON.parse(e.parameter.data);
+      } catch (parseError) {
+        console.error('Form JSON 파싱 오류:', parseError);
+        return createJsonResponse({
+          success: false,
+          error: 'Form JSON 파싱 실패',
+          message: parseError.toString(),
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    // 기존 JSON POST 데이터가 있는 경우
+    else if (e && e.postData && e.postData.contents) {
+      console.log('POST 데이터:', e.postData.contents);
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (parseError) {
+        console.error('JSON 파싱 오류:', parseError);
+        return createJsonResponse({
+          success: false,
+          error: 'JSON 파싱 실패',
+          message: parseError.toString(),
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    // 데이터가 없는 경우
+    else {
+      console.log('POST 데이터 없음 - 테스트 응답 반환');
+      return createJsonResponse({
+        success: true,
+        message: 'POST 엔드포인트가 정상적으로 작동합니다',
+        timestamp: new Date().toISOString(),
+        note: 'POST 데이터가 제공되지 않았습니다'
+      });
+    }
+    
     console.log('파싱된 데이터:', data);
     
     // 테스트 데이터 확인
@@ -103,9 +144,10 @@ function doPost(e) {
  * OPTIONS 요청 처리 (CORS Preflight)
  */
 function doOptions(e) {
-  return ContentService
-    .createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT);
+  const output = ContentService.createTextOutput('');
+  output.setMimeType(ContentService.MimeType.TEXT);
+  
+  return output;
 }
 
 /**
@@ -114,9 +156,10 @@ function doOptions(e) {
  * @returns {Object} ContentService 응답
  */
 function createJsonResponse(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  const output = ContentService.createTextOutput(JSON.stringify(data));
+  output.setMimeType(ContentService.MimeType.JSON);
+  
+  return output;
 }
 
 /**
@@ -181,7 +224,7 @@ function setupHeaders(sheet) {
     '별점_추천의향',
     '세션시작시간',
     '세션종료시간',
-    '체험시간(분)',
+    '체험시간(초)',
     'IP주소',
     '브라우저정보'
   ];
@@ -210,25 +253,67 @@ function createDataRow(data) {
   const now = new Date();
   const kstTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // KST 변환
   
-  // 체험 시간 계산 (분 단위)
+  // KST 기준 날짜와 시간 생성
+  const kstYear = kstTime.getUTCFullYear();
+  const kstMonth = String(kstTime.getUTCMonth() + 1).padStart(2, '0');
+  const kstDay = String(kstTime.getUTCDate()).padStart(2, '0');
+  const kstHour = String(kstTime.getUTCHours()).padStart(2, '0');
+  const kstMinute = String(kstTime.getUTCMinutes()).padStart(2, '0');
+  const kstSecond = String(kstTime.getUTCSeconds()).padStart(2, '0');
+  
+  const kstDateString = `${kstYear}-${kstMonth}-${kstDay}`;
+  const kstTimeString = `${kstHour}:${kstMinute}:${kstSecond}`;
+  
+  // 체험 시간 계산 (초 단위)
   const experienceTime = data.sessionEnd && data.sessionStart ? 
-    Math.round((new Date(data.sessionEnd) - new Date(data.sessionStart)) / 60000) : 0;
+    Math.round((new Date(data.sessionEnd) - new Date(data.sessionStart)) / 1000) : 0;
+  
+  // 세션 시작/종료 시간을 KST로 변환
+  const sessionStartKST = data.sessionStart ? 
+    new Date(new Date(data.sessionStart).getTime() + (9 * 60 * 60 * 1000)).toISOString().replace('T', ' ').substring(0, 19) : '';
+  const sessionEndKST = data.sessionEnd ? 
+    new Date(new Date(data.sessionEnd).getTime() + (9 * 60 * 60 * 1000)).toISOString().replace('T', ' ').substring(0, 19) : 
+    new Date(kstTime.getTime()).toISOString().replace('T', ' ').substring(0, 19);
+  
+  // 데이터 변환 함수들
+  const convertGender = (gender) => {
+    const genderMap = { 'male': '남성', 'female': '여성' };
+    return genderMap[gender] || gender || '';
+  };
+  
+  const convertExperience = (experience) => {
+    const experienceMap = { 'yes': '예', 'no': '아니요' };
+    return experienceMap[experience] || experience || '';
+  };
+  
+  const convertAge = (age) => {
+    const ageMap = {
+      'teen': '~10대',
+      '20s': '20대', 
+      '30s': '30대',
+      '40s': '40대',
+      '50s': '50대',
+      '60s': '60대',
+      '70s': '70대~'
+    };
+    return ageMap[age] || age || '';
+  };
   
   return [
-    kstTime.toISOString().split('T')[0], // 날짜 (YYYY-MM-DD)
-    kstTime.toLocaleTimeString('ko-KR'), // 시간 (HH:MM:SS)
+    kstDateString,                       // 날짜 (YYYY-MM-DD) - KST 기준
+    kstTimeString,                       // 시간 (HH:MM:SS) - KST 기준
     data.tabletId || '',                 // 테블릿 ID
     data.userId || '',                   // 사용자 ID
-    data.survey?.gender || '',           // 성별
-    data.survey?.experience || '',       // 모션베드 경험
-    data.survey?.age || '',              // 연령대
+    convertGender(data.survey?.gender),  // 성별 (한국어 변환)
+    convertExperience(data.survey?.experience), // 모션베드 경험 (한국어 변환)
+    convertAge(data.survey?.age),        // 연령대 (한국어 변환)
     data.ratings?.page5 || '',           // 별점1: 체험 만족도
     data.ratings?.page8 || '',           // 별점2: 제품 만족도
     data.ratings?.page12 || '',          // 별점3: 구매 의향
     data.ratings?.page18 || '',          // 별점4: 추천 의향
-    data.sessionStart || '',             // 세션 시작 시간
-    data.sessionEnd || kstTime.toISOString(), // 세션 종료 시간
-    experienceTime,                      // 체험 시간 (분)
+    sessionStartKST,                     // 세션 시작 시간 (KST)
+    sessionEndKST,                       // 세션 종료 시간 (KST)
+    experienceTime,                      // 체험 시간 (초)
     data.ipAddress || '',                // IP 주소
     data.browserInfo || ''               // 브라우저 정보
   ];
@@ -289,5 +374,39 @@ function initializeSheet() {
   } catch (error) {
     console.error('시트 초기화 실패:', error);
     return { success: false, error: error.toString() };
+  }
+}
+
+/**
+ * API 연결 테스트 함수 - 웹에서 직접 호출 가능
+ */
+function testConnection() {
+  try {
+    console.log('API 연결 테스트 시작');
+    
+    // 스프레드시트 접근 테스트
+    const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const spreadsheetName = spreadsheet.getName();
+    
+    // 현재 시간
+    const now = new Date();
+    const kstTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+    
+    return {
+      success: true,
+      message: 'API 연결 및 스프레드시트 접근 성공!',
+      spreadsheetName: spreadsheetName,
+      spreadsheetId: SPREADSHEET_ID,
+      testTime: kstTime.toISOString(),
+      version: '1.0.0'
+    };
+    
+  } catch (error) {
+    console.error('연결 테스트 실패:', error);
+    return {
+      success: false,
+      error: error.toString(),
+      spreadsheetId: SPREADSHEET_ID
+    };
   }
 }

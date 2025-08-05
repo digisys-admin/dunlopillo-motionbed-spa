@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunlopillo Motion Bed - 전체 페이지 테스트</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            font-family: 'Pretendard', Arial, sans-serif;
+        }
+        
+        .test-container {
+            float: none;
+            flex-shrink: 1;
+            display: block;
+            margin: 160px 0px 0px;
+            inset: 0px;
+            position: relative;
+            overflow: visible;
+            box-sizing: border-box;
+            width: 1464px;
+            height: 2904px;
+            padding: 0px 0px 1936px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .page-preview {
+            width: 100%;
+            height: 800px;
+            margin-bottom: 40px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+        }
+        
+        .page-header {
+            background: #18306c;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-content {
+            width: 1280px;
+            height: 800px;
+            transform-origin: top left;
+            transform: scale(0.85);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-content .screen-container {
+            width: 1280px;
+            height: 800px;
+            position: relative;
+        }
+        
+        .navigation {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 250px;
+        }
+        
+        .navigation h3 {
+            margin: 0 0 15px 0;
+            color: #18306c;
+            font-size: 16px;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 8px 12px;
+            margin: 4px 0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .nav-item:hover {
+            background: #f0f0f0;
+            color: #18306c;
+        }
+        
+        .nav-item.active {
+            background: #18306c;
+            color: white;
+        }
+        
+        .test-controls {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-controls h2 {
+            margin: 0 0 15px 0;
+            color: #18306c;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #18306c;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2d4a8c;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-error {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 -->
+    <div class="navigation">
+        <h3>📱 페이지 네비게이션</h3>
+        <a href="#home" class="nav-item" data-page="home">🏠 홈 화면</a>
+        <a href="#page1" class="nav-item" data-page="page1">1️⃣ 설문조사</a>
+        <a href="#page2" class="nav-item" data-page="page2">2️⃣ 침대 소개</a>
+        <a href="#page3" class="nav-item" data-page="page3">3️⃣ 체형 측정</a>
+        <a href="#page4" class="nav-item" data-page="page4">4️⃣ 자세 안내</a>
+        <a href="#page5" class="nav-item" data-page="page5">5️⃣ 별점 평가 1</a>
+        <a href="#page6" class="nav-item" data-page="page6">6️⃣ 팁 1</a>
+        <a href="#page7" class="nav-item" data-page="page7">7️⃣ 체험 안내</a>
+        <a href="#page8" class="nav-item" data-page="page8">8️⃣ 별점 평가 2</a>
+        <a href="#page9" class="nav-item" data-page="page9">9️⃣ 팁 2</a>
+        <a href="#page10" class="nav-item" data-page="page10">🔟 수면 자세</a>
+        <a href="#page11" class="nav-item" data-page="page11">1️⃣1️⃣ 체험 시간</a>
+        <a href="#page12" class="nav-item" data-page="page12">1️⃣2️⃣ 별점 평가 3</a>
+        <a href="#page13" class="nav-item" data-page="page13">1️⃣3️⃣ 제로지 기능</a>
+        <a href="#page14" class="nav-item" data-page="page14">1️⃣4️⃣ 팁 3</a>
+        <a href="#page15" class="nav-item" data-page="page15">1️⃣5️⃣ 모션베드 소개</a>
+        <a href="#page16-1" class="nav-item" data-page="page16-1">1️⃣6️⃣-1️⃣ 팁 4</a>
+        <a href="#page16-2" class="nav-item" data-page="page16-2">1️⃣6️⃣-2️⃣ 팁 5</a>
+        <a href="#page17" class="nav-item" data-page="page17">1️⃣7️⃣ 자유 체험</a>
+        <a href="#page18" class="nav-item" data-page="page18">1️⃣8️⃣ 최종 평가</a>
+        <a href="#page19" class="nav-item" data-page="page19">1️⃣9️⃣ 완료</a>
+    </div>
+
+    <!-- 메인 컨테이너 -->
+    <div class="test-container">
+        <!-- 테스트 컨트롤 -->
+        <div class="test-controls">
+            <h2>🧪 Dunlopillo Motion Bed - 전체 페이지 테스트</h2>
+            <div class="control-group">
+                <button class="btn btn-primary" onclick="loadAllPages()">🔄 모든 페이지 로드</button>
+                <button class="btn btn-secondary" onclick="clearAllPages()">🗑️ 페이지 초기화</button>
+                <button class="btn btn-secondary" onclick="testInteractions()">⚡ 상호작용 테스트</button>
+                <button class="btn btn-secondary" onclick="exportScreenshots()">📸 스크린샷 내보내기</button>
+                <div class="status-indicator status-success" id="loadStatus">
+                    ✅ 준비 완료
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이지 프리뷰들 -->
+        <div id="pageContainer">
+            <!-- 페이지들이 여기에 동적으로 로드됩니다 -->
+        </div>
+    </div>
+
+    <!-- JavaScript 파일들 -->
+    <script src="survey-data-manager.js"></script>
+    <script src="survey-data.js"></script>
+    <script src="screens.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        console.log('🧪 테스트 페이지 초기화 시작');
+        
+        // 페이지 정의
+        const pages = [
+            { id: 'home', title: '홈 화면', type: 'main' },
+            { id: 'page1', title: '설문조사', type: 'survey' },
+            { id: 'page2', title: '침대 소개', type: 'info' },
+            { id: 'page3', title: '체형 측정', type: 'measurement' },
+            { id: 'page4', title: '자세 안내', type: 'guide' },
+            { id: 'page5', title: '별점 평가 1', type: 'rating' },
+            { id: 'page6', title: '팁 1', type: 'tip' },
+            { id: 'page7', title: '체험 안내', type: 'guide' },
+            { id: 'page8', title: '별점 평가 2', type: 'rating' },
+            { id: 'page9', title: '팁 2', type: 'tip' },
+            { id: 'page10', title: '수면 자세', type: 'guide' },
+            { id: 'page11', title: '체험 시간', type: 'experience' },
+            { id: 'page12', title: '별점 평가 3', type: 'rating' },
+            { id: 'page13', title: '제로지 기능', type: 'feature' },
+            { id: 'page14', title: '팁 3', type: 'tip' },
+            { id: 'page15', title: '모션베드 소개', type: 'info' },
+            { id: 'page16-1', title: '팁 4', type: 'tip' },
+            { id: 'page16-2', title: '팁 5', type: 'tip' },
+            { id: 'page17', title: '자유 체험', type: 'experience' },
+            { id: 'page18', title: '최종 평가', type: 'rating' },
+            { id: 'page19', title: '완료', type: 'complete' }
+        ];
+
+        // 상태 관리
+        let loadedPages = new Set();
+        let currentlyLoading = false;
+
+        // 상태 업데이트
+        function updateStatus(message, isError = false) {
+            const statusEl = document.getElementById('loadStatus');
+            statusEl.textContent = message;
+            statusEl.className = `status-indicator ${isError ? 'status-error' : 'status-success'}`;
+        }
+
+        // 페이지 컨테이너 초기화
+        function initializePageContainer() {
+            const container = document.getElementById('pageContainer');
+            container.innerHTML = '';
+            
+            pages.forEach(page => {
+                const pageDiv = document.createElement('div');
+                pageDiv.id = page.id;
+                pageDiv.className = 'page-preview';
+                pageDiv.innerHTML = `
+                    <div class="page-header">
+                        <span>${page.title} (${page.id})</span>
+                        <span>타입: ${page.type}</span>
+                    </div>
+                    <div class="page-content" id="content-${page.id}">
+                        <div class="loading-placeholder" style="
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            height: 100%; 
+                            color: #666;
+                            font-size: 18px;
+                        ">
+                            📄 페이지를 로드하려면 '모든 페이지 로드' 버튼을 클릭하세요
+                        </div>
+                    </div>
+                `;
+                container.appendChild(pageDiv);
+            });
+        }
+
+        // 개별 페이지 로드
+        async function loadPage(pageId) {
+            console.log(`🔄 페이지 로드 중: ${pageId}`);
+            
+            const contentEl = document.getElementById(`content-${pageId}`);
+            if (!contentEl) return;
+
+            try {
+                // 로딩 상태 표시
+                contentEl.innerHTML = `
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        height: 100%; 
+                        color: #18306c;
+                        font-size: 16px;
+                    ">
+                        ⏳ ${pageId} 로딩 중...
+                    </div>
+                `;
+
+                // screens 객체 확인
+                if (!window.screens) {
+                    throw new Error('screens 객체를 찾을 수 없습니다');
+                }
+
+                const screenData = window.screens[pageId];
+                if (!screenData) {
+                    throw new Error(`${pageId} 화면 데이터를 찾을 수 없습니다`);
+                }
+
+                // 홈 화면 특별 처리
+                if (pageId === 'home') {
+                    contentEl.innerHTML = `
+                        <div class="screen-container home-screen">
+                            ${generateHomeContent()}
+                        </div>
+                    `;
+                } else {
+                    contentEl.innerHTML = `
+                        <div class="screen-container">
+                            ${screenData.content}
+                        </div>
+                    `;
+                }
+
+                loadedPages.add(pageId);
+                console.log(`✅ 페이지 로드 완료: ${pageId}`);
+
+                // 이미지 에러 처리
+                const images = contentEl.querySelectorAll('img');
+                images.forEach(img => {
+                    img.onerror = () => {
+                        console.warn(`🖼️ 이미지 로드 실패: ${img.src}`);
+                        img.style.display = 'none';
+                    };
+                });
+
+            } catch (error) {
+                console.error(`❌ 페이지 로드 실패: ${pageId}`, error);
+                contentEl.innerHTML = `
+                    <div class="error-message">
+                        ❌ 페이지 로드 실패: ${pageId}<br>
+                        오류: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 홈 화면 콘텐츠 생성
+        function generateHomeContent() {
+            const videoSources = window.VIDEO_SOURCES || [];
+            const startVideo = videoSources[0] || '';
+
+            return `
+                <div class="home-content" style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+                    <div class="home-video-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);">
+                        ${startVideo ? `
+                            <video 
+                                src="${startVideo}"
+                                style="width: 100%; height: 100%; object-fit: cover;"
+                                muted 
+                                loop>
+                            </video>
+                        ` : ''}
+                    </div>
+                    <div class="home-overlay" style="position: relative; z-index: 5;">
+                        <img
+                            class="home-logo"
+                            src="assets/pics/dunlopillo_logo_white.png"
+                            style="position: absolute; width: 707px; height: 157px; top: 289px; left: 287px; object-fit: cover; z-index: 6;"
+                            alt="Dunlopillo Logo"
+                        />
+                        <div class="motion-bed" style="z-index: 6;">MOTION BED</div>
+                        <div class="buttons home-start-button" style="z-index: 6; cursor: pointer;">
+                            <div class="label">화면을 터치하시면 체험이 시작됩니다</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 모든 페이지 로드
+        async function loadAllPages() {
+            if (currentlyLoading) return;
+            
+            currentlyLoading = true;
+            updateStatus('⏳ 모든 페이지 로딩 중...');
+
+            try {
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
+                    updateStatus(`⏳ 로딩 중... (${i + 1}/${pages.length}) ${page.title}`);
+                    await loadPage(page.id);
+                    
+                    // 너무 빠른 로딩 방지 (UI 피드백용)
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                updateStatus(`✅ 모든 페이지 로드 완료 (${loadedPages.size}/${pages.length})`);
+            } catch (error) {
+                console.error('❌ 페이지 로딩 오류:', error);
+                updateStatus('❌ 로딩 중 오류 발생', true);
+            } finally {
+                currentlyLoading = false;
+            }
+        }
+
+        // 페이지 초기화
+        function clearAllPages() {
+            loadedPages.clear();
+            initializePageContainer();
+            updateStatus('🗑️ 페이지 초기화 완료');
+        }
+
+        // 상호작용 테스트
+        function testInteractions() {
+            updateStatus('⚡ 상호작용 테스트 시작');
+            
+            // 별점 버튼 테스트
+            const ratingButtons = document.querySelectorAll('.page5-star-item');
+            ratingButtons.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1.1)';
+                    btn.style.transition = 'transform 0.2s';
+                    setTimeout(() => {
+                        btn.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
+
+            // 설문 버튼 테스트
+            const surveyButtons = document.querySelectorAll('.page1-content .view, .page1-content .label-wrapper');
+            surveyButtons.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.style.boxShadow = '0 0 10px rgba(24, 48, 108, 0.5)';
+                    btn.style.transition = 'box-shadow 0.3s';
+                    setTimeout(() => {
+                        btn.style.boxShadow = '';
+                    }, 300);
+                }, index * 50);
+            });
+
+            setTimeout(() => {
+                updateStatus('✅ 상호작용 테스트 완료');
+            }, 2000);
+        }
+
+        // 스크린샷 내보내기 (시뮬레이션)
+        function exportScreenshots() {
+            updateStatus('📸 스크린샷 준비 중...');
+            
+            setTimeout(() => {
+                const loadedCount = loadedPages.size;
+                updateStatus(`📸 ${loadedCount}개 페이지 스크린샷 준비 완료`);
+                
+                // 실제 구현에서는 html2canvas 등을 사용할 수 있습니다
+                console.log('📸 스크린샷 내보내기:', Array.from(loadedPages));
+            }, 1000);
+        }
+
+        // 네비게이션 처리
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // 활성 상태 업데이트
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // 해당 페이지로 스크롤
+                    const pageId = item.dataset.page;
+                    const pageEl = document.getElementById(pageId);
+                    if (pageEl) {
+                        pageEl.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
+                    }
+                });
+            });
+        }
+
+        // 초기화
+        function initialize() {
+            console.log('🚀 테스트 페이지 초기화');
+            
+            // screens 객체 확인 대기
+            const checkScreens = () => {
+                if (window.screens) {
+                    console.log('✅ screens 객체 발견:', Object.keys(window.screens));
+                    initializePageContainer();
+                    setupNavigation();
+                    updateStatus('✅ 초기화 완료 - 자동으로 모든 페이지를 로드합니다');
+                    
+                    // 자동으로 모든 페이지 로드 시작 (1초 후)
+                    setTimeout(() => {
+                        loadAllPages();
+                    }, 1000);
+                } else {
+                    console.log('⏳ screens 객체 대기 중...');
+                    setTimeout(checkScreens, 500);
+                }
+            };
+            
+            checkScreens();
+        }
+
+        // 페이지 로드 완료 후 초기화
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+
+        console.log('🧪 테스트 페이지 스크립트 로드 완료');
+    </script>
+</body>
+</html>

@@ -392,6 +392,9 @@ body {
   }
 }
 
+/* page19 홈 버튼은 이제 이미지로 대체됨 - CSS 불필요 */
+/* 기존 home-complete-btn 스타일 제거됨 */
+
 /* ==== 공통 카드 스타일 최적화 ==== */
 .card {
   position: absolute;

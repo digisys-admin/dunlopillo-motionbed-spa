@@ -45,7 +45,7 @@ class SurveyDataManager {
 
     /** @private @type {string} */
     // API 엔드포인트 설정
-        this._apiEndpoint = 'https://script.google.com/macros/s/AKfycbyC025uuAdcxa8QnIxloCANUm1QMm4dC6sgMXSuK7jH2asoyCYQEoTHdAxmUacT2wjE8Q/exec';
+        this._apiEndpoint = 'https://script.google.com/macros/s/AKfycbwP5rQmthmDRxOlQC6x7hZNlqSeO8ZjCPgtt8EyM3Suhx9f33EvY_WQiD_RMrgSxxqWSA/exec';
     
     /** @private @type {string} */
     this._tabletId = this._generateTabletId();
@@ -74,6 +74,9 @@ class SurveyDataManager {
     /** @private @type {boolean} */
     this._isDataSent = false;
     
+    /** @private @type {boolean} */
+    this._allowAutoTransmission = false; // 자동 전송 완전 차단
+    
     /** @private @type {Array<Function>} */
     this._pendingRequests = [];
 
@@ -90,10 +93,10 @@ class SurveyDataManager {
     console.log(`👤 사용자 ID: ${this._userId}`);
     console.log(`⏰ 세션 시작: ${this._sessionStart.toISOString()}`);
     
-    // 페이지 언로드 시 데이터 전송
-    window.addEventListener('beforeunload', () => {
-      this._sendFinalData();
-    });
+    // 페이지 언로드 시 데이터 전송 제거 (수동 전송만 허용)
+    // window.addEventListener('beforeunload', () => {
+    //   this._sendFinalData();
+    // });
     
     // 주기적으로 데이터 백업 (5분마다)
     setInterval(() => {
@@ -189,11 +192,8 @@ class SurveyDataManager {
     // 로컬 스토리지에 백업
     localStorage.setItem('dunlopillo_survey_data', JSON.stringify(this._surveyData));
     
-    // 설문이 완료되면 중간 저장
-    if (this._isSurveyComplete()) {
-      console.log('✅ [SurveyDataManager] 설문조사 완료');
-      this._sendIntermediateData();
-    }
+    // 설문은 저장만 하고 전송하지 않음 (중복 전송 방지)
+    console.log('📝 [SurveyDataManager] 설문 응답 저장됨 (전송 대기 중)');
   }
 
   /**
@@ -216,11 +216,11 @@ class SurveyDataManager {
     this._ratingsData[page] = rating;
     console.log(`⭐ [SurveyDataManager] 별점 저장: ${page} = ${rating}점`);
     
-    // 로컬 스토리지에 백업
+    // 로컬 스토리지에 저장
     localStorage.setItem('dunlopillo_ratings_data', JSON.stringify(this._ratingsData));
     
-    // 실시간으로 데이터 전송
-    this._sendIntermediateData();
+    // 별점 저장 시에는 중간 전송하지 않음 (최종 완료 시에만 전송)
+    console.log('⭐ [SurveyDataManager] 별점 저장됨 (전송 대기 중)');
   }
 
   /**
@@ -229,41 +229,126 @@ class SurveyDataManager {
    * @returns {boolean}
    */
   _isSurveyComplete() {
-    return Object.values(this._surveyData).every(value => value !== null);
+    const result = Object.values(this._surveyData).every(value => value !== null && value !== undefined && value !== '');
+    
+    console.log('🔍 [DEBUG] 설문 체크 결과:', {
+      surveyData: this._surveyData,
+      result
+    });
+    
+    return result;
   }
 
   /**
-   * 중간 데이터 전송 (실시간)
+   * 모든 별점이 입력되었는지 확인
+   * @private
+   * @returns {boolean}
+   */
+  _hasAllRatings() {
+    const requiredPages = ['page5', 'page8', 'page12', 'page18'];
+    const result = requiredPages.every(page => {
+      const rating = this._ratingsData[page];
+      return rating !== null && rating !== undefined && rating >= 1 && rating <= 5;
+    });
+    
+    console.log('🔍 [DEBUG] 별점 체크 결과:', {
+      requiredPages,
+      currentRatings: this._ratingsData,
+      result
+    });
+    
+    return result;
+  }
+
+  /**
+   * 설문조사 완료 시 수동으로 최종 데이터 전송
+   * @public
+   */
+  async completeSurvey() {
+    console.log('🎯 [SurveyDataManager] 설문조사 완료 트리거');
+    
+    // 이미 전송된 경우 중복 방지
+    if (this._isDataSent) {
+      console.log('⚠️ [SurveyDataManager] 데이터 이미 전송됨. 중복 전송 차단.');
+      return;
+    }
+    
+    // 수동 호출 플래그 설정
+    this._isManualCall = true;
+    
+    await this._sendFinalData();
+  }
+
+  /**
+   * 세션 시작 시점 업데이트 (홈 화면 터치 시)
+   * @public
+   */
+  startSession() {
+    this._sessionStart = new Date();
+    console.log(`⏰ [SurveyDataManager] 세션 시작: ${this._sessionStart.toISOString()}`);
+  }
+
+  /**
+   * 새 세션 준비 (데이터 초기화)
    * @private
    */
-  async _sendIntermediateData() {
-    if (this._isDataSent) return; // 중복 전송 방지
+  _prepareNewSession() {
+    // 데이터 전송 상태 초기화
+    this._isDataSent = false;
     
-    try {
-      const data = this._buildDataPayload(false);
-      await this._sendToGoogleSheets(data);
-      console.log('📤 [SurveyDataManager] 중간 데이터 전송 완료');
-    } catch (error) {
-      console.warn('⚠️ [SurveyDataManager] 중간 데이터 전송 실패 (Google Sheets 미설정):', error.message);
-      // 로컬에는 정상적으로 저장되므로 계속 진행
-    }
+    // 잠시 후 새로운 세션을 위해 데이터 초기화
+    setTimeout(() => {
+      this._userId = this._generateUserId();
+      this._sessionStart = new Date();
+      this._surveyData = { gender: null, experience: null, age: null };
+      this._ratingsData = { page5: null, page8: null, page12: null, page18: null };
+      console.log('🔄 [SurveyDataManager] 새 세션 준비 완료');
+    }, 3000); // 3초 후 초기화
   }
 
   /**
-   * 최종 데이터 전송
+   * 최종 데이터 전송 (설문조사 완료 시에만)
    * @private
    */
   async _sendFinalData() {
-    if (this._isDataSent) return;
+    // 이미 전송했으면 중복 전송 방지
+    if (this._isDataSent) {
+      console.log('📤 [SurveyDataManager] 데이터 이미 전송됨. 중복 전송 방지.');
+      return;
+    }
+    
+    // 자동 전송이 허용되지 않고, 수동 호출이 아닌 경우 차단
+    if (!this._allowAutoTransmission && !this._isManualCall) {
+      console.log('🚫 [SurveyDataManager] 자동 전송 차단됨. 수동 호출만 허용.');
+      return;
+    }
+    
+    // 디버깅: 현재 데이터 상태 출력
+    console.log('🔍 [DEBUG] 설문 데이터:', this._surveyData);
+    console.log('🔍 [DEBUG] 별점 데이터:', this._ratingsData);
+    console.log('🔍 [DEBUG] 설문 완료 여부:', this._isSurveyComplete());
+    console.log('🔍 [DEBUG] 별점 완료 여부:', this._hasAllRatings());
+    
+    // 현재 세션의 완성도 체크 (모든 필수 데이터가 있는지 확인)
+    if (!this._isSurveyComplete() || !this._hasAllRatings()) {
+      console.log('📤 [SurveyDataManager] 설문조사가 완료되지 않았습니다. 전송 생략.');
+      return;
+    }
     
     try {
       const data = this._buildDataPayload(true);
+      console.log('🔍 [DEBUG] 전송할 데이터:', data);
       await this._sendToGoogleSheets(data);
       this._isDataSent = true;
-      console.log('🎯 [SurveyDataManager] 최종 데이터 전송 완료');
+      console.log('📤 [SurveyDataManager] 최종 데이터 전송 완료');
+      
+      // 전송 후 새 세션 준비
+      this._prepareNewSession();
     } catch (error) {
       console.warn('⚠️ [SurveyDataManager] 최종 데이터 전송 실패 (Google Sheets 미설정):', error.message);
-      // 로컬 데이터는 유지됨
+      // 로컬에는 정상적으로 저장되므로 계속 진행
+    } finally {
+      this._isManualCall = false; // 플래그 초기화
     }
   }
 
@@ -315,7 +400,7 @@ class SurveyDataManager {
   }
 
   /**
-   * Google Sheets로 데이터 전송
+   * Google Sheets로 데이터 전송 (Form Submit 방식 - CORS 우회)
    * @private
    * @param {Object} data
    * @returns {Promise<Object>}
@@ -324,38 +409,57 @@ class SurveyDataManager {
     console.log('📤 [SurveyDataManager] Google Sheets 전송 시도:', this._apiEndpoint);
     console.log('📤 [SurveyDataManager] 전송 데이터:', data);
     
-    try {
-      const response = await fetch(this._apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-        mode: 'cors'
-      });
-      
-      console.log('📤 [SurveyDataManager] 응답 상태:', response.status, response.statusText);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    return new Promise((resolve, reject) => {
+      try {
+        // 임시 iframe 생성 (새 창 대신 숨겨진 iframe 사용)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.name = 'hidden_form_target';
+        document.body.appendChild(iframe);
+        
+        // 임시 form 엘리먼트 생성
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = this._apiEndpoint;
+        form.target = 'hidden_form_target'; // iframe으로 전송
+        form.style.display = 'none';
+        
+        // 데이터를 JSON 문자열로 변환해서 hidden input에 넣기
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = JSON.stringify(data);
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        
+        // form submit
+        form.submit();
+        
+        // form과 iframe 정리
+        setTimeout(() => {
+          document.body.removeChild(form);
+          document.body.removeChild(iframe);
+        }, 1000);
+        
+        console.log('📤 [SurveyDataManager] Form 전송 완료 (백그라운드)');
+        
+        // form submit은 응답을 직접 받을 수 없으므로 성공으로 가정
+        resolve({
+          success: true,
+          message: 'Form 전송 완료 (백그라운드)',
+          method: 'form-submit-hidden'
+        });
+        
+      } catch (error) {
+        console.error('📤 [SurveyDataManager] 전송 실패 상세:', {
+          error: error.message,
+          endpoint: this._apiEndpoint,
+          data: data
+        });
+        reject(error);
       }
-      
-      const result = await response.json();
-      console.log('📤 [SurveyDataManager] 응답 결과:', result);
-      
-      if (!result.success) {
-        throw new Error(result.error || '알 수 없는 오류가 발생했습니다');
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('📤 [SurveyDataManager] 전송 실패 상세:', {
-        error: error.message,
-        endpoint: this._apiEndpoint,
-        data: data
-      });
-      throw error;
-    }
+    });
   }
 
   /**
@@ -446,6 +550,29 @@ class SurveyDataManager {
   }
 
   /**
+   * 테스트용 데이터 강제 설정
+   * @public
+   */
+  setTestData() {
+    this._surveyData = {
+      gender: 'male',
+      experience: 'yes', 
+      age: '50s'
+    };
+    this._ratingsData = {
+      page5: 5,
+      page8: 4,
+      page12: 3,
+      page18: 5
+    };
+    this._isDataSent = false;
+    
+    console.log('🧪 [SurveyDataManager] 테스트 데이터 설정 완료');
+    console.log('📊 설문 데이터:', this._surveyData);
+    console.log('⭐ 별점 데이터:', this._ratingsData);
+  }
+
+  /**
    * 시스템 상태 조회
    * @public
    * @returns {Object}
@@ -502,6 +629,21 @@ class SurveyDataManager {
     window.saveRating = (page, rating) => {
       console.log('⭐ [Legacy] saveRating 호출:', page, rating);
       window.surveyDataManager.saveRating(page, rating);
+    };
+
+    window.completeSurvey = () => {
+      console.log('🎯 [Legacy] completeSurvey 호출');
+      window.surveyDataManager.completeSurvey();
+    };
+
+    window.startSession = () => {
+      console.log('⏰ [Legacy] startSession 호출');
+      window.surveyDataManager.startSession();
+    };
+
+    window.setTestData = () => {
+      console.log('🧪 [Legacy] setTestData 호출');
+      window.surveyDataManager.setTestData();
     };
     
     console.log('✅ [SurveyDataManager] 전역 함수 등록 완료');

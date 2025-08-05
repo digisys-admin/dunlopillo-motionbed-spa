@@ -29,7 +29,7 @@ class LegacySurveyData {
     this._dealerName = '기본대리점';
     
     /** @type {string} */
-    this._webAppUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    this._webAppUrl = 'https://script.google.com/macros/s/AKfycbwP5rQmthmDRxOlQC6x7hZNlqSeO8ZjCPgtt8EyM3Suhx9f33EvY_WQiD_RMrgSxxqWSA/exec';
     
     this._initializeManager();
   }

@@ -29,7 +29,7 @@ class LegacySurveyData {
     this._dealerName = '기본대리점';
     
     /** @type {string} */
-    this._webAppUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    this._webAppUrl = 'https://script.google.com/macros/s/AKfycbwP5rQmthmDRxOlQC6x7hZNlqSeO8ZjCPgtt8EyM3Suhx9f33EvY_WQiD_RMrgSxxqWSA/exec';
     
     this._initializeManager();
   }
@@ -130,26 +130,27 @@ class LegacySurveyData {
   }
 
   /**
-   * 설문 응답 저장
-   * @param {string} question - 질문 유형 (gender, experience, age)
-   * @param {string} answer - 응답 값
-   * @returns {Promise<boolean>}
-   */
-  async saveSurveyResponse(question, answer) {
-    try {
-      if (!this._manager) {
-        console.warn('⚠️ [LegacySurveyData] 매니저가 아직 초기화되지 않았습니다');
-        return false;
-      }
-
-      this._manager.saveSurveyResponse(question, answer);
-      console.log(`📝 [LegacySurveyData] 설문 응답 저장: ${question} = ${answer}`);
-      return true;
-    } catch (error) {
-      console.error('❌ [LegacySurveyData] 설문 응답 저장 실패:', error);
-      return false;
-    }
+ * 설문조사 응답 저장 함수 (레거시 지원)
+ * @param {string} category - 설문 카테고리 
+ * @param {string} value - 선택된 값
+ */
+function saveSurveyResponse(category, value) {
+  console.log('📝 [LegacySurveyData] 설문 응답 저장:', category, value);
+  
+  // 새로운 매니저가 있으면 그것을 사용
+  if (window.surveyDataManager && typeof window.surveyDataManager.saveSurveyResponse === 'function') {
+    window.surveyDataManager.saveSurveyResponse(category, value);
+    return;
   }
+  
+  // 전역 함수가 있으면 사용
+  if (window.saveSurveyResponse && window.saveSurveyResponse !== saveSurveyResponse) {
+    window.saveSurveyResponse(category, value);
+    return;
+  }
+  
+  console.warn('⚠️ [LegacySurveyData] 매니저가 아직 초기화되지 않았습니다');
+}
 
   /**
    * 별점 저장

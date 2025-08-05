@@ -30,7 +30,7 @@
 const APP_CONSTANTS = Object.freeze({
   PAGE_ORDER: ['page1', 'page2', 'page3', 'page4', 'page5', 'page6', 'page7', 
                'page8', 'page9', 'page10', 'page11', 'page12', 'page13', 'page14', 
-               'page15', 'page16', 'page17', 'page18', 'page19'],
+               'page15', 'page16-1', 'page16-2', 'page17', 'page18', 'page19'],
   INITIAL_SCREEN: 'home',
   APP_CONTAINER_ID: 'app',
   TRANSITION_DURATION: 300,
@@ -377,6 +377,9 @@ class MotionBedApp {
     /** @private @type {ImageOptimizer} */
     this._imageOptimizer = ImageOptimizer.getInstance();
 
+    /** @private @type {number|null} */
+    this._autoHomeTimer = null;
+
     this._initialize();
   }
 
@@ -481,10 +484,29 @@ class MotionBedApp {
       console.log('⏰ [USER] 홈 버튼 클릭으로 자동 진행 취소');
     }
 
-    // 🎙️ 현재 재생 중인 음성 가이드 중단
+    // � 자동 홈 이동 타이머 취소
+    if (this._autoHomeTimer) {
+      clearTimeout(this._autoHomeTimer);
+      this._autoHomeTimer = null;
+      console.log('🏠 [USER] 홈 버튼 수동 클릭으로 자동 홈 이동 타이머 취소');
+    }
+
+    // �🎙️ 현재 재생 중인 음성 가이드 중단
     if (window.voiceGuideSystem?.stopVoice) {
       window.voiceGuideSystem.stopVoice();
       console.log('🎙️ [USER] 홈 버튼 클릭으로 음성 가이드 중단');
+    }
+
+    // 📊 설문조사 완료 시 최종 데이터 전송 (page19에서만)
+    if (this._currentScreen === 'page19') {
+      console.log('🎯 [SurveyComplete] page19에서 홈 버튼 클릭 - 최종 데이터 전송');
+      if (window.completeSurvey) {
+        window.completeSurvey();
+      } else {
+        console.warn('⚠️ [SurveyComplete] completeSurvey 함수를 찾을 수 없음');
+      }
+    } else {
+      console.log(`ℹ️ [SurveyComplete] ${this._currentScreen}에서 홈 이동 - 데이터 전송하지 않음`);
     }
 
     this._navigateToScreen(APP_CONSTANTS.INITIAL_SCREEN);
@@ -581,7 +603,7 @@ class MotionBedApp {
       }
 
       // 데이터 저장
-      this._saveSurveyData(category, value);
+      this._saveSurveyResponse(category, value);
       
       this._logInfo('설문 응답 저장됨', { category, value, screen: this._currentScreen });
     } catch (error) {
@@ -625,6 +647,13 @@ class MotionBedApp {
       if (window.clearAutoProgress && typeof window.clearAutoProgress === 'function') {
         window.clearAutoProgress();
       }
+
+      // 🏠 기존 자동 홈 이동 타이머 정리
+      if (this._autoHomeTimer) {
+        clearTimeout(this._autoHomeTimer);
+        this._autoHomeTimer = null;
+        console.log('🏠 [Navigation] 페이지 이동으로 자동 홈 이동 타이머 정리');
+      }
       
       const previousScreen = this._currentScreen;
       this._currentScreen = screenName;
@@ -638,28 +667,28 @@ class MotionBedApp {
 
       await this._render();
       
-      // 홈 화면일 때 동영상 음소거 (배경 음악과 충돌 방지)
+      // 홈 화면으로 돌아갈 때 배경음악 절대 건드리지 않기
       if (screenName === 'home') {
         setTimeout(() => {
           const homeVideo = document.getElementById('homeBackgroundVideo');
-          if (homeVideo) {
+          const soundToggle = document.getElementById('soundToggle');
+          
+          if (homeVideo && soundToggle) {
+            // 홈 동영상은 항상 음소거 상태 유지 (배경음악과 분리)
             homeVideo.muted = true;
             homeVideo.volume = 0;
-            console.log('🔇 홈 화면 동영상 음소거 (페이지 전환)');
             
-            // 배경 음악도 함께 동기화
-            if (window.backgroundMusicSystem?.syncWithHomeVideo) {
-              window.backgroundMusicSystem.syncWithHomeVideo();
-            }
+            // 사운드 토글 UI만 배경음악 상태에 맞춰 업데이트 (음악 자체는 건드리지 않음)
+            const isMusicEnabled = window.backgroundMusicSystem?.isEnabled?.() || false;
+            soundToggle.textContent = isMusicEnabled ? "🔊" : "🔇";
+            
+            console.log('� 홈 화면 복귀 - 홈 동영상 음소거, 배경음악은 그대로 유지');
+            console.log(`🎵 배경음악 상태: ${isMusicEnabled ? '활성화' : '비활성화'} (변경 없음)`);
           }
         }, 500);
       } else {
-        // 홈이 아닌 페이지로 이동할 때 홈 동영상 상태에 따라 배경 음악 결정
-        setTimeout(() => {
-          if (window.backgroundMusicSystem?.syncWithHomeVideo) {
-            window.backgroundMusicSystem.syncWithHomeVideo();
-          }
-        }, 100);
+        // 홈이 아닌 페이지로 이동할 때는 아무것도 하지 않음
+        console.log('📄 다른 페이지로 이동 - 배경 음악 상태 유지');
       }
 
       // 🎙️ 페이지별 음성 가이드 자동 재생 (음성 파일이 있는 페이지만)
@@ -688,6 +717,19 @@ class MotionBedApp {
           console.log(`⏰ [DEBUG] 자동 진행 시스템 시작: ${screenName}`);
         }
       }, 1500); // 페이지 로딩 후 1.5초 뒤 자동 진행 시작
+
+      // 🏠 page19에서 30초 후 자동 홈 이동
+      if (screenName === 'page19') {
+        console.log('🏠 [AutoHome] page19 도달 - 30초 후 자동 홈 이동 시작');
+        this._autoHomeTimer = setTimeout(() => {
+          console.log('🏠 [AutoHome] 30초 경과 - 자동으로 홈으로 이동');
+          // 설문 완료 처리
+          if (window.completeSurvey) {
+            window.completeSurvey();
+          }
+          this._navigateToScreen(APP_CONSTANTS.INITIAL_SCREEN);
+        }, 30000); // 30초 = 30,000ms
+      }
       
       // FastImageOptimizer로 다음 페이지 이미지 프리로드 - 임시 비활성화
       // if (window.fastImageOptimizer && typeof window.fastImageOptimizer.preloadNextPageImages === 'function') {
@@ -952,16 +994,16 @@ class MotionBedApp {
       </div>
       
       <!-- 소리 토글 버튼 - 오른쪽 상단 (전체화면 버튼과 구별) -->
-      <div id="soundToggle" onclick="toggleVideoSound(event)"
+      <div id="soundToggle" onclick="toggleBackgroundMusic()"
            style="position: absolute; top: 20px; right: 20px; z-index: 10000; 
-                  background: rgba(34, 197, 94, 0.7); padding: 8px 12px; border-radius: 8px; 
+                  background: transparent; padding: 8px 12px; border-radius: 8px; 
                   font-size: 1.8rem; color: white; cursor: pointer; line-height: 1; 
                   width: 50px; height: 50px; text-align: center; display: flex; 
                   align-items: center; justify-content: center; backdrop-filter: blur(10px);
                   -webkit-backdrop-filter: blur(10px); transition: all 0.2s ease;
                   border: 2px solid rgba(255, 255, 255, 0.2);"
-           onmouseover="this.style.background='rgba(34, 197, 94, 0.9)'; this.style.transform='scale(1.1)'; this.style.borderColor='rgba(255, 255, 255, 0.4)'"
-           onmouseout="this.style.background='rgba(34, 197, 94, 0.7)'; this.style.transform='scale(1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
+           onmouseover="this.style.background='rgba(0, 0, 0, 0.3)'; this.style.transform='scale(1.1)'; this.style.borderColor='rgba(255, 255, 255, 0.4)'"
+           onmouseout="this.style.background='transparent'; this.style.transform='scale(1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
         🔇
       </div>
       
@@ -1029,6 +1071,12 @@ class MotionBedApp {
         }
         
         console.log('🖱️ 홈 화면 클릭 - 다음 페이지로 이동');
+        
+        // 📊 세션 시작 시점 기록
+        if (window.startSession) {
+          window.startSession();
+        }
+        
         this.next();
       }, { signal: this._abortController.signal });
       
@@ -1042,6 +1090,12 @@ class MotionBedApp {
         
         e.preventDefault(); // 더블탭 등 방지
         console.log('👆 홈 화면 터치 - 다음 페이지로 이동');
+        
+        // 📊 세션 시작 시점 기록
+        if (window.startSession) {
+          window.startSession();
+        }
+        
         this.next();
       }, { signal: this._abortController.signal });
     }
@@ -1051,6 +1105,12 @@ class MotionBedApp {
       startButton.addEventListener('click', (e) => {
         e.stopPropagation(); // 중복 실행 방지
         console.log('🚀 시작 버튼 클릭 - 다음 페이지로 이동');
+        
+        // 📊 세션 시작 시점 기록
+        if (window.startSession) {
+          window.startSession();
+        }
+        
         this.next();
       }, { signal: this._abortController.signal });
     }
@@ -1200,15 +1260,21 @@ class MotionBedApp {
    * @param {string} category 
    * @param {string} value 
    */
-  _saveSurveyData(category, value) {
-    // 레거시 지원
+    _saveSurveyResponse(category, value) {
+    console.log('🔥 [DEBUG] _saveSurveyResponse 호출됨:', { category, value, currentScreen: this._currentScreen });
+    
+    // 기존 시스템 지원  
     if (window.surveyData) {
       window.surveyData[category] = value;
     }
     
-    // 새로운 시스템 지원
-    if (window.surveyData?.saveSurveyResponse) {
-      window.surveyData.saveSurveyResponse(category, value);
+    // 새로운 surveyDataManager 사용
+    if (window.surveyDataManager?.saveSurveyResponse) {
+      console.log('📝 [DEBUG] surveyDataManager.saveSurveyResponse 호출:', category, value);
+      window.surveyDataManager.saveSurveyResponse(category, value);
+    } else {
+      console.error('❌ [ERROR] surveyDataManager.saveSurveyResponse를 찾을 수 없습니다');
+      console.log('🔍 [DEBUG] window.surveyDataManager:', window.surveyDataManager);
     }
 
     this._dispatchEvent(APP_EVENTS.SURVEY_UPDATE, { category, value });
@@ -1220,14 +1286,23 @@ class MotionBedApp {
    * @param {number} rating 
    */
   _saveRatingData(rating) {
+    console.log('🔥 [DEBUG] _saveRatingData 호출됨:', { rating, currentScreen: this._currentScreen });
+    
     // 레거시 지원
     if (window.surveyData) {
       window.surveyData.rating = rating;
+      console.log('📝 [DEBUG] surveyData.rating 설정됨:', rating);
     }
     
-    // 새로운 시스템 지원
-    if (window.surveyData?.saveRating) {
-      window.surveyData.saveRating(this._currentScreen, rating);
+    // 새로운 시스템 지원 - surveyDataManager 사용
+    if (window.surveyDataManager?.saveRating) {
+      console.log('📝 [DEBUG] surveyDataManager.saveRating 호출:', this._currentScreen, rating);
+      window.surveyDataManager.saveRating(this._currentScreen, rating);
+    } else {
+      console.error('❌ [DEBUG] surveyDataManager.saveRating 사용 불가:', {
+        surveyDataManager: !!window.surveyDataManager,
+        saveRating: !!window.surveyDataManager?.saveRating
+      });
     }
 
     this._dispatchEvent(APP_EVENTS.RATING_UPDATE, { rating, screen: this._currentScreen });
@@ -1361,60 +1436,6 @@ class MotionBedApp {
    */
   removeEventListener(eventType, handler) {
     this._eventBus.removeEventListener(eventType, handler);
-  }
-}
-
-/**
- * 전역 소리 토글 함수 (개선된 버전)
- */
-function toggleVideoSound(event) {
-  event.stopPropagation(); // ❗ 부모로 이벤트 전파 방지
-
-  const video = document.getElementById("homeBackgroundVideo");
-  const icon = document.getElementById("soundToggle");
-
-  if (!video) {
-    console.warn('🔊 홈 동영상 요소를 찾을 수 없습니다');
-    return;
-  }
-
-  if (!icon) {
-    console.warn('🔊 사운드 토글 버튼을 찾을 수 없습니다');
-    return;
-  }
-
-  console.log(`🔊 [DEBUG] 현재 동영상 음소거 상태: ${video.muted}`);
-
-  if (video.muted) {
-    // 음소거 해제
-    video.muted = false;
-    
-    // 동영상 재생 (비동기 처리)
-    video.play().then(() => {
-      console.log('🔊 홈 동영상 재생 시작');
-      icon.textContent = "🔊";
-      
-      // 배경 음악도 함께 활성화 (약간의 지연 후)
-      setTimeout(() => {
-        if (window.backgroundMusicSystem?.syncWithHomeVideo) {
-          window.backgroundMusicSystem.syncWithHomeVideo();
-        }
-      }, 100);
-    }).catch(error => {
-      console.warn('🔊 홈 동영상 재생 실패:', error);
-      // 실패해도 아이콘은 업데이트
-      icon.textContent = "🔊";
-    });
-  } else {
-    // 음소거 설정
-    video.muted = true;
-    icon.textContent = "🔇";
-    console.log('🔇 홈 동영상 음소거');
-    
-    // 배경 음악도 함께 비활성화 (즉시)
-    if (window.backgroundMusicSystem?.syncWithHomeVideo) {
-      window.backgroundMusicSystem.syncWithHomeVideo();
-    }
   }
 }
 
