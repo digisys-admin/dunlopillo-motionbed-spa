@@ -362,3 +362,4 @@ du -sh assets/pics/         # 약 20MB (PNG 이미지들)
 ## 📞 지원
 
 문제가 발생하면 GitHub Issues에 등록해주세요.
+# Trigger new Netlify build #오후
