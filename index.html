@@ -219,6 +219,13 @@
       </div>
     </div>
 
+    <!-- 디버그 정보 표시 (임시) - screen-container 밖에서 항상 표시 -->
+    <!-- 
+    <div id="debugInfo" style="position: fixed; top: 20px; left: 20px; background: rgba(255,0,0,0.9); color: white; padding: 8px; border-radius: 5px; font-size: 12px; z-index: 99999; font-family: monospace; font-weight: bold;">
+      크기: <span id="screenSize">확인중...</span>
+    </div>
+    -->
+    
     <!-- 글로벌 구조: 전체 바탕(찐한 회색) + 화면(1280x800 옅은 회색) -->
     <div class="screen-container" id="app">
       <!-- 여기에 각 페이지 컨텐츠가 렌더링됩니다 -->
@@ -1536,6 +1543,33 @@
           src: backgroundAudio?.src
         });
       }, 5000);
+      
+      // 화면 크기 디버그 정보 업데이트
+      function updateScreenSizeDebug() {
+        const screenContainer = document.querySelector('.screen-container');
+        const screenSizeElement = document.getElementById('screenSize');
+        if (screenContainer && screenSizeElement) {
+          const width = screenContainer.offsetWidth;
+          const height = screenContainer.offsetHeight;
+          const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+          screenSizeElement.textContent = `${width}x${height} ${isFullscreen ? '(전체화면)' : '(일반화면)'}`;
+        }
+      }
+      
+      // 초기 크기 표시
+      updateScreenSizeDebug();
+      
+      // 전체화면 변경 감지
+      document.addEventListener('fullscreenchange', updateScreenSizeDebug);
+      document.addEventListener('webkitfullscreenchange', updateScreenSizeDebug);
+      document.addEventListener('mozfullscreenchange', updateScreenSizeDebug);
+      document.addEventListener('MSFullscreenChange', updateScreenSizeDebug);
+      
+      // 윈도우 리사이즈 감지
+      window.addEventListener('resize', updateScreenSizeDebug);
+      
+      // 주기적으로 업데이트 (추가 안전장치)
+      setInterval(updateScreenSizeDebug, 1000);
     </script>
   </body>
 </html>

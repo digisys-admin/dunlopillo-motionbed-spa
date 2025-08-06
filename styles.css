@@ -261,15 +261,14 @@ a {
   --spacing-2xl: 48px;
   --spacing-3xl: 64px;
   
-  /* 레이아웃 크기 */
-  --screen-width: 1280px;
-  --screen-height: 800px;
+  /* 레이아웃 크기 - 원래 크기로 복원 */
+  --screen-width: 1280px;   /* 원래 크기로 복원 */
+  --screen-height: 800px;   /* 원래 크기로 복원 */
   
   /* 전체화면 최적화 변수 */
   --fullscreen-scale: 1;
   --target-width: 1280px;
   --target-height: 800px;
-  --screen-height: 800px;
   --card-width: 268px;
   --card-height: 355px;
   --button-width: 97px;
@@ -792,7 +791,7 @@ body {
 .page1-content .element .label-wrapper {
   width: 220px;
   gap: 19px;
-  padding: 10px 90px;
+  padding: 10px 20px;
   left: 35px;
   font-weight: 500;
 }
@@ -1454,19 +1453,6 @@ p.page2-intro-text {
   position: relative;
 }
 
-/* ==== 반응형 스타일 ==== */
-@media (max-width: 768px) {
-  .option-group {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .option-btn {
-    width: 80%;
-    max-width: 300px;
-  }
-}
-
 /* ==== 전체화면 및 사운드 버튼 스타일 ==== */
 #fullscreenToggle,
 #soundToggle {
@@ -1505,43 +1491,7 @@ p.page2-intro-text {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* 태블릿에서 버튼 크기 조정 */
-@media (min-width: 768px) and (max-width: 1024px) {
-  #fullscreenToggle,
-  #soundToggle {
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 1.8rem !important;
-    top: 20px !important;
-  }
-  
-  #fullscreenToggle {
-    left: 20px !important;
-  }
-  
-  #soundToggle {
-    right: 20px !important;
-  }
-}
-
-/* 모바일에서 버튼 크기 조정 */
-@media (max-width: 767px) {
-  #fullscreenToggle,
-  #soundToggle {
-    width: 45px !important;
-    height: 45px !important;
-    font-size: 1.6rem !important;
-    top: 15px !important;
-  }
-  
-  #fullscreenToggle {
-    left: 15px !important;
-  }
-  
-  #soundToggle {
-    right: 15px !important;
-  }
-}
+/* ==== 공통 버튼 스타일 최적화 ==== */
 
 /* ==== PAGE3 - 라텍스 매트리스 & 모션베드 체험 시작 페이지 ==== */
 .page3-element {
@@ -1960,10 +1910,10 @@ p.page2-intro-text {
 
 .page6-content-wrapper {
   position: absolute;
-  width: 703px; /* 기존 사이즈 유지 */
+  width: 703px; /* 기존 사이즈로 복원 */
   height: 220px; /* 기존 200px에서 20px 증가 - page9 텍스트 겹침 방지 */
   top: 341px; /* 기존 위치 유지 */
-  left: 289px; /* 기존 위치 유지 */
+  left: 289px; /* 기존 위치로 복원 */
   background-color: var(--light-gray);
   border-radius: 15px;
   box-shadow: 2px 3px 6px 2px #00000040;
@@ -1974,7 +1924,7 @@ p.page2-intro-text {
   width: 635px;
   height: 180px;
   top: 18px;
-  left: 34px;
+  left: 20px !important; /* 강제 적용으로 0px까지 왼쪽으로 */
   display: flex;
   flex-direction: column;
   justify-content: center; /* 세로 중앙 정렬 */
@@ -1989,9 +1939,11 @@ p.page2-intro-text {
   letter-spacing: -2.00px;
   line-height: 30.6px;
   text-align: left;
-  width: 100%;
+  width: auto !important; /* 100%에서 auto로 변경하여 nowrap이 작동하도록 */
+  max-width: none !important; /* 최대 폭 제한 해제 */
   margin: 0;
   padding: 0;
+  white-space: normal !important; /* 인라인 nowrap이 우선되도록 */
 }
 
 .page6-text-2 {
@@ -2019,102 +1971,6 @@ p.page2-intro-text {
   letter-spacing: 0;
   line-height: 44.2px;
   white-space: nowrap;
-}
-
-/* ==== 테블릿 전용 반응형 TIP 페이지 ==== */
-@media screen and (max-width: 1024px) {
-  .page6-content-wrapper {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 80% !important;
-    max-width: 600px !important;
-    height: 240px !important; /* 모바일에서도 높이 증가 */
-  }
-  
-  .page6-tip-label {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-  
-  .page6-content-group {
-    left: 20px !important;
-    width: calc(100% - 40px) !important;
-    height: 200px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-  }
-  
-  .page6-text-1 {
-    position: static !important;
-    font-family: "Pretendard-Medium", Helvetica !important;
-    font-weight: 500 !important;
-    color: var(--black) !important;
-    font-size: 22px !important;
-    letter-spacing: -2.00px !important;
-    line-height: 30.6px !important;
-    text-align: left !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    word-break: keep-all !important;
-  }
-  
-  /* page9 전용 레이아웃 조정 (page6과 동일한 구조 적용) */
-  .page9 .page6-content-wrapper {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 80% !important;
-    max-width: 600px !important;
-    height: 280px !important; /* page9는 텍스트가 더 길어서 높이 더 증가 */
-  }
-  
-  .page9 .page6-tip-label {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-  
-  .page9 .page6-content-group {
-    left: 20px !important;
-    width: calc(100% - 40px) !important;
-    text-align: left !important;
-    height: 240px !important; /* page9는 텍스트가 더 길어서 높이 더 증가 */
-  }
-  
-  .page9 .page6-text-1 {
-    font-family: "Pretendard-Medium", Helvetica !important;
-    font-weight: 500 !important;
-    color: var(--black) !important;
-    font-size: 17px !important;
-    letter-spacing: -1.5px !important;
-    line-height: 26px !important;
-    text-align: left !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    position: static !important;
-    word-break: normal !important;
-    white-space: normal !important;
-  }
-  
-  /* page9에서 절대 위치 요소들 조정 (bottom, right 속성 가진 요소들) */
-  .page9 [style*="position: absolute"][style*="bottom:"],
-  .page9 [style*="position: absolute"][style*="right:"] {
-    position: relative !important;
-    bottom: auto !important;
-    right: auto !important;
-    margin-top: 10px !important;
-    margin-bottom: 10px !important;
-  }
-  
-  /* 더 구체적인 셀렉터로 강제 적용 */
-  .page6-element .page6-content-wrapper .page6-content-group .page6-text-1 {
-    text-align: left !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    text-justify: none !important;
-  }
 }
 
 .page6-version {
@@ -2430,92 +2286,35 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
   box-sizing: border-box !important;
 }
 
-:fullscreen .screen-container, :-webkit-full-screen .screen-container, :-moz-full-screen .screen-container, :-ms-fullscreen .screen-container {
-  /* 태블릿 1280px 기준 비율 유지하면서 스케일링 */
+/* ==== 전체화면 모드 - 1280x800 고정 ==== */
+:fullscreen .screen-container, 
+:-webkit-full-screen .screen-container, 
+:-moz-full-screen .screen-container, 
+:-ms-fullscreen .screen-container {
+  /* 항상 1280x800 고정 크기 유지 */
   width: 1280px !important;
   height: 800px !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  
+  /* 전체화면에서 중앙 정렬 */
   position: fixed !important;
   top: 50% !important;
   left: 50% !important;
-  background: #2d3748 !important;
+  transform: translate(-50%, -50%) !important;
+  
+  /* 전체화면 스타일 */
+  margin: 0 !important;
+  padding: 0 !important;
   border: none !important;
-  outline: none !important;
-  box-sizing: border-box !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+  outline: none !important;
+  box-sizing: border-box !important;
   
-  /* 화면 크기에 맞게 비율 유지하면서 스케일링 */
-  transform: translate(-50%, -50%) scale(var(--fullscreen-scale, 1)) !important;
-  transform-origin: center center !important;
+  /* 배경 유지 */
+  background-color: var(--light-gray) !important;
 }
 
-/* 🎯 테블릿 전체화면 특별 최적화 */
-@media (min-width: 768px) and (max-width: 1024px) {
-  :fullscreen, :-webkit-full-screen, :-moz-full-screen, :-ms-fullscreen {
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    outline: none !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: #2d3748 !important;
-    /* 테블릿에서 안전 영역 무시 */
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  
-  :fullscreen body, :-webkit-full-screen body, :-moz-full-screen body, :-ms-fullscreen body {
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    outline: none !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: #2d3748 !important;
-  }
-  
-  :fullscreen .screen-container, :-webkit-full-screen .screen-container, :-moz-full-screen .screen-container, :-ms-fullscreen .screen-container {
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    outline: none !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: #f5f5f5 !important;
-    transform: none !important;
-    box-shadow: none !important;
-  }
-}
+/* 전체화면 관련 미디어 쿼리 제거 - 1280x800 고정 유지 */
 
 /* 웹킷 기반 브라우저 (Chrome, Safari) */
 :-webkit-full-screen {
@@ -2614,47 +2413,7 @@ html:fullscreen, html:-webkit-full-screen, html:-moz-full-screen, html:-ms-fulls
 }
 
 /* ==== 태블릿 전체화면/볼륨 버튼 최적화 ==== */
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-  /* 메인 컨테이너 스케일링 */
-  .screen-container {
-    transform: scale(0.8) !important;
-    transform-origin: center center !important;
-    overflow: hidden !important;
-  }
-  
-  #soundToggle, #fullscreenToggle {
-    position: fixed !important;
-    z-index: 99999 !important;
-    width: 50px !important;
-    height: 50px !important;
-    font-size: 1.8rem !important;
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: white !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-  }
-  
-  #soundToggle {
-    top: 20px !important;
-    right: 20px !important;
-  }
-  
-  #fullscreenToggle {
-    top: 20px !important;
-    left: 20px !important;
-  }
-  
-  #soundToggle:hover, #fullscreenToggle:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-    transform: scale(1.05) !important;
-  }
-}
+/* 화면 크기 조정 미디어 쿼리 제거 - 1280x800 고정 유지 */
 
 /* ==== 안전한 전체화면 모드 ==== */
 /* 맥북 크롬 호환성을 위한 부드러운 전체화면 처리 */
@@ -2729,36 +2488,7 @@ body.fullscreen-mode .container {
   transform-origin: center center !important;
 }
 
-/* ==== 모바일 전체화면/볼륨 버튼 최적화 ==== */
-@media screen and (max-width: 767px) {
-  #soundToggle, #fullscreenToggle {
-    position: fixed !important;
-    z-index: 99999 !important;
-    width: 45px !important;
-    height: 45px !important;
-    font-size: 1.6rem !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-    border: 2px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: white !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-  }
-  
-  #soundToggle {
-    top: 15px !important;
-    right: 15px !important;
-  }
-  
-  #fullscreenToggle {
-    top: 15px !important;
-    left: 15px !important;
-  }
-}
+/* 모바일 관련 미디어 쿼리 제거 - 1280x800 고정 유지 */
 
 /* ==== 📱 전체화면 최적화 스타일 ==== */
 /* 브라우저 파란색/흰색 여백 완전 제거 - 최종 강화 */

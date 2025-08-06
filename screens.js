@@ -913,8 +913,8 @@ const screens = {
         <div class="page6-content-wrapper">
           <div class="page6-content-group">
             <p class="page6-text-1">
-              연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.<br />
-              <span style="white-space: nowrap;">다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄어들고, 혈액순환도 향상되는데요.</span><br />
+              <span style="white-space: nowrap;">연구에 의하면 우리는 평평하게 잘 때 허리와 어깨에 가장 많은 부담이 간다고 합니다.</span><br />
+              <span style="white-space: nowrap;">다리를 올림으로서 허리와 어깨에 가해지는 압력이 줄고, 혈액순환도 향상되는데요.</span><br />
               <br /> 이렇게 모션베드를 사용해서 다리를 올리고 휴식을 취하시면 부종이 완화되거나 <br />허리/어깨가 편해지는 것을 느끼실 수 있습니다.<br />
             </p>
           </div>
@@ -1073,7 +1073,8 @@ const screens = {
       ${COMMON_ELEMENTS.getButtons('page11')}
       
       <div class="page7-element">
-        <p class="page7-main-text">리모컨을 사용해서 다리와 머리부분을 조정하시고<br />스마트폰을 사용하기 가장 편안한 자세를 만들어 주세요.</p>
+        <p class="page7-main-text">리모컨을 사용해서 다리와 머리부분을 조정하시고<br />
+        <span style="white-space: nowrap;">스마트폰을 사용하기 가장 편안한 자세를 만들어 주세요.</span></p>
         
         ${COMMON_ELEMENTS.getProgressBar('page11')}
         
@@ -1195,8 +1196,8 @@ const screens = {
           <div class="page6-content-group">
             <p class="page6-text-1">
               이 자세는 영어로 Perfect Recovery Posture 라고도 하는데요.<br />
-              <span style="white-space: nowrap;">이는 '가장 완벽한 회복자세'라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서</span><br />
-              수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현했습니다.
+              <span style="white-space: nowrap;">'가장 완벽한 회복자세' 라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서</span><br />
+              <span style="white-space: nowrap;">수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현했습니다.</span><br />
             </p>
             <p class="page6-text-2">
             <br />
@@ -1344,8 +1345,8 @@ const screens = {
               text-indent: 0 !important;
               direction: ltr;
             ">
-              손에 힘을 빼 보세요, 긴장감이 풀리고 편안해 지셨죠?<br /> 
-              <span style="white-space: nowrap;">그힘을 뺀 상태가 방금 경험하신 가장 편안한 제로G 상태와 동일한 자세 입니다.</span>
+              손을 1자로 쭉 펴주세요. 손에 힘을 빼 보세요. 긴장감이 풀리고 편안해 지셨죠?<br /> 
+              <span style="white-space: nowrap;">그 힘을 뺀 상태가 방금 경험하신 가장 편안한 제로G 상태와 동일한 자세 입니다.</span>
               
             </p>
             <p style="
@@ -1448,8 +1449,8 @@ const screens = {
               direction: ltr;
             ">
               실제로 8시간 수면중에 보통 60~80번을 뒤척인다고 하는데요.<br />
-              <span style="white-space: nowrap;">뒤척임에 즉각적으로 받쳐주는 던롭필로 라텍스 매트리스와 모션베드를 함께 사용하시면</span><br />
-              뒤척임이 줄어들어 더욱 편안한 숙면을 경험하실 수 있습니다.<br />
+              <span style="white-space: nowrap;">뒤척임에 즉각적으로 받쳐주는 던롭필로 라텍스 매트리스와 모션베드를 함께</span><br />
+              사용하시면, 뒤척임이 줄어들어 더욱 편안한 숙면을 경험하실 수 있습니다.<br />
               
             </p>
           </div>
