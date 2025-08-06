@@ -1408,12 +1408,46 @@ const screens = {
           white-space: nowrap;
         ">TIP!</div>
         
+        <!-- 손 이미지들 - TIP 라벨 바로 아래에 배치 -->
+        <div class="page16-hand-images" style="
+          position: absolute;
+          top: 230px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 5px;
+          z-index: 99;
+          width: auto;
+          height: auto;
+        ">
+          <img class="page16-hand-img" 
+               src="${LOCAL_IMAGES.P16_HAND1}" 
+               alt="Hand Image 1" style="
+            width: 266px;
+            height: 266px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            position: relative;
+          " onload="console.log('✅ P16_HAND1 로컬 로드 성공')" />
+          <img class="page16-hand-img" 
+               src="${LOCAL_IMAGES.P16_HAND2}" 
+               alt="Hand Image 2" style="
+            width: 266px;
+            height: 266px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            position: relative;
+          " onload="console.log('✅ P16_HAND2 로컬 로드 성공')" />
+        </div>
+        
         <!-- Content Wrapper - page16-2용 텍스트 (손 이미지 위치로 이동) -->
         <div style="
           position: absolute;
           width: 703px;
           height: 200px;
-          top: 230px;
+          top: 510px;
           left: 50%;
           transform: translateX(-50%);
           background-color: var(--light-gray);
