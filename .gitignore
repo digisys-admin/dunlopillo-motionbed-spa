@@ -1,14 +1,14 @@
-# 미디어 파일들 (CDN으로 관리)
-assets/voices/
-assets/pics/
-*.mp3
-*.wav
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.mp4
-*.mov
+# 미디어 파일들 - 필요한 assets은 포함하도록 주석 처리
+# assets/voices/
+# assets/pics/
+# *.mp3
+# *.wav
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# *.mp4
+# *.mov
 
 # 개발 도구들
 .DS_Store
