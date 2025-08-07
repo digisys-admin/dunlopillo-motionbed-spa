@@ -660,8 +660,8 @@
 
       // ⏰ 자동 진행 설정 (페이지별)
       const AUTO_PROGRESS_CONFIG = {
-        // 홈 화면: 30초 후 자동 진행
-        'home': { hasVoice: false, delay: 30 },
+        // 홈 화면: 자동 진행 비활성화 (수동 터치만 가능)
+        'home': { hasVoice: false, delay: 0 },
         
         // 음성 안내 있는 페이지들 (음성 종료 후 5초)
         'page3': { hasVoice: true, delay: 9 },
@@ -806,8 +806,8 @@
         clearAutoProgress();
         
         const config = AUTO_PROGRESS_CONFIG[pageName];
-        if (!config) {
-          console.log(`⏰ [AUTO] 자동 진행 설정 없음: ${pageName}`);
+        if (!config || config.delay <= 0) {
+          console.log(`⏰ [AUTO] 자동 진행 설정 없음 또는 delay가 0: ${pageName}`);
           return;
         }
 
