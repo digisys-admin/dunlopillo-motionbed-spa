@@ -1369,15 +1369,15 @@ const screens = {
               text-indent: 0 !important;
               direction: ltr;
             ">
-              던롭필로 모션베드는 던롭필로 천연 라텍스 매트리스와 완벽한 조합이기에<br />
-              더욱 안정감 있고 편안한 휴식 및 숙면을 취하는 데 도움이 될 거라고 확신합니다.
+              화학성분으로 만든 타사 폼 매트리스와 달리, 던롭필로 천연 라텍스 매트리스와<br />
+              <span style="white-space: nowrap;">모션베드의 완벽한 조합으로 더욱 안정감 있고 편안한 휴식과 숙면을 제공합니다.</span>
             </p>
           </div>
         </div>      </div>
     `
   },
 
-  // page16-2: 16-2단계 - 최종 TIP 2 (page16-1과 동일 구조)
+  // page16-2: 16-2단계 - 최종 TIP 2 (page6와 유사한 구조로 변경)
   'page16-2': {
     type: 'tip',
     pageTitle: '라텍스 매트리스 & 모션베드 체험',
