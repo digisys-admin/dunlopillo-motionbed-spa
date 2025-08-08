@@ -772,7 +772,7 @@ const screens = {
             <div class="page2-title-sub">모션베드 특장점</div>
           </div>
           <div class="page2-overlap-3">
-            <p class="page2-kg-text">튼튼한 스틸 프레임과<br />유칼립투스 합판으로 제작되어<br />뒤틀림과 변형 걱정이 없고,<br /><br />340kg까지 견딜 수 있는<br />높은 내구성과 안정성을 자랑합니다.</p>
+            <p class="page2-kg-text">튼튼한 스틸 프레임과 친환경<br />프리미엄 유칼립투스 합판으로<br />제작되어 뒤틀림과 변형 걱정이 없고,<br /><br />340kg까지 견딜 수 있는<br />높은 내구성과 안정성을 자랑합니다.</p>
             <img class="page2-bed-img" src="${IMG.PAGE2_BED}" onerror="this.src='${LOCAL_IMAGES.PAGE2_BED}'" style="border-radius: 15px; box-shadow: 2px 3px 6px 2px #00000040;" />
           </div>
         </div>
@@ -1196,11 +1196,12 @@ const screens = {
           <div class="page6-content-group">
             <p class="page6-text-1">
               이 자세는 영어로 Perfect Recovery Posture 라고도 하는데요.<br />
-              <span style="white-space: nowrap;">'가장 완벽한 회복자세' 라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션에서</span><br />
-              <span style="white-space: nowrap;">수백만건의 데이터를 바탕으로 사람들이 가장 편안하게 느끼는 자세를 구현했습니다.</span><br />
+              <span style="white-space: nowrap;">'가장 완벽한 회복자세' 라는 뜻입니다. 세계 최대 모션베드 제조사인 에르고모션과</span><br />
+              <span style="white-space: nowrap;">던롭필로가 협업하여 수백만건의 데이터를 바탕으로 사람들이 가장 편안하게</span><br />
+              <span style="white-space: nowrap;"> 느끼는 자세를 구현했습니다.</span>
             </p>
             <p class="page6-text-2">
-            <br />
+      
               완벽한 상하체 각도를 통해 마치 무중력에 있는 듯한 느낌을 받을 수 있으며,<br />
               신체 압력 완화, 혈액순환 향상, 호흡 안정화 등의 효과를 느낄 수 있습니다.
             </p>
