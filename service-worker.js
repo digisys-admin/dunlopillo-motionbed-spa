@@ -3,8 +3,10 @@
  * 오프라인 기능 및 캐싱 관리
  */
 
-const CACHE_NAME = 'dunlopillo-spa-v1.1.0';
-const CACHE_URLS = [
+const CACHE_NAME = 'dunlopillo-spa-v1.3.0';
+
+// 🎯 핵심 파일들 - Network First 전략 (WiFi 연결 시 항상 최신 버전 확인)
+const NETWORK_FIRST_URLS = [
   '/',
   '/index.html',
   '/styles.css',
@@ -12,7 +14,11 @@ const CACHE_URLS = [
   '/screens.js',
   '/survey-data-manager.js',
   '/survey-data.js',
-  '/manifest.json',
+  '/manifest.json'
+];
+
+// 📦 캐시 우선 파일들 - Cache First 전략 (미디어 파일들)
+const CACHE_FIRST_URLS = [
   
   // 홈 화면 동영상들 (Cloudinary)
   'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767432/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_01_tt5wqe.mp4',
@@ -71,6 +77,9 @@ const CACHE_URLS = [
   '/assets/voices/voice_tip5.mp3'
 ];
 
+// 🎯 전체 캐시 URL 목록 (설치 시 프리로드용)
+const ALL_CACHE_URLS = [...NETWORK_FIRST_URLS, ...CACHE_FIRST_URLS];
+
 // 📦 Service Worker 설치
 self.addEventListener('install', (event) => {
   console.log('🚀 Service Worker 설치 중...');
@@ -79,7 +88,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('📦 캐시 오픈 성공:', CACHE_NAME);
-        return cache.addAll(CACHE_URLS);
+        return cache.addAll(ALL_CACHE_URLS);
       })
       .then(() => {
         console.log('✅ 모든 리소스 캐시 완료');
@@ -113,16 +122,15 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 🌐 네트워크 요청 가로채기 (Cache First 전략)
+// 🌐 네트워크 요청 가로채기 (스마트 캐싱 전략)
 self.addEventListener('fetch', (event) => {
   // GET 요청만 처리
   if (event.request.method !== 'GET') {
     return;
   }
   
-  // Google Drive 동영상은 캐시, Google Sheets API는 네트워크 우선
+  // Google Sheets API는 항상 네트워크 우선
   if (event.request.url.includes('script.google.com')) {
-    // Google Sheets API만 네트워크 우선 (설문 데이터 전송용)
     event.respondWith(
       fetch(event.request)
         .catch(() => {
@@ -135,50 +143,91 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // 캐시에 있으면 캐시에서 제공
-        if (response) {
-          console.log('📦 캐시에서 제공:', event.request.url);
-          return response;
-        }
-        
-        // 캐시에 없으면 네트워크에서 가져오기
-        console.log('🌐 네트워크에서 가져오기:', event.request.url);
-        return fetch(event.request)
-          .then((response) => {
-            // 정상 응답이면 캐시에 저장
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseClone);
-                });
-            }
-            return response;
-          })
-          .catch(() => {
-            console.log('❌ 네트워크 실패 - 오프라인 페이지 제공');
-            
-            // HTML 요청인 경우 메인 페이지 제공
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/index.html');
-            }
-            
-            // 이미지 요청인 경우 로고 제공
-            if (event.request.headers.get('accept').includes('image')) {
-              return caches.match('/assets/pics/dunlopillo_logo.png');
-            }
-            
-            // 기타 요청은 네트워크 오류 반환
-            return new Response('오프라인 상태입니다', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
-          });
-      })
+  const requestUrl = new URL(event.request.url);
+  const isNetworkFirstFile = NETWORK_FIRST_URLS.some(url => 
+    requestUrl.pathname === url || requestUrl.pathname.endsWith(url)
   );
+  
+  if (isNetworkFirstFile) {
+    // 🎯 핵심 파일들: Network First 전략 (WiFi 연결 시 항상 최신 버전 확인)
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // ✅ 네트워크 성공: 캐시 업데이트 후 최신 버전 제공
+          if (response.status === 200) {
+            console.log('🔄 최신 버전 가져오기 성공:', event.request.url);
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseClone);
+                console.log('💾 캐시 업데이트 완료:', event.request.url);
+              });
+          }
+          return response;
+        })
+        .catch(() => {
+          // ❌ 네트워크 실패: 캐시에서 제공 (오프라인 대응)
+          console.log('📦 네트워크 실패 - 캐시에서 제공:', event.request.url);
+          return caches.match(event.request)
+            .then((cachedResponse) => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              
+              // 캐시에도 없으면 오프라인 페이지 제공
+              if (event.request.headers.get('accept').includes('text/html')) {
+                return caches.match('/index.html');
+              }
+              
+              return new Response('오프라인 상태입니다', {
+                status: 503,
+                statusText: 'Service Unavailable'
+              });
+            });
+        })
+    );
+  } else {
+    // 📦 미디어 파일들: Cache First 전략 (네트워크 절약)
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          if (response) {
+            console.log('📦 캐시에서 제공:', event.request.url);
+            return response;
+          }
+          
+          // 캐시에 없으면 네트워크에서 가져오기
+          console.log('🌐 네트워크에서 가져오기:', event.request.url);
+          return fetch(event.request)
+            .then((response) => {
+              if (response.status === 200) {
+                const responseClone = response.clone();
+                caches.open(CACHE_NAME)
+                  .then((cache) => {
+                    cache.put(event.request, responseClone);
+                  });
+              }
+              return response;
+            })
+            .catch(() => {
+              console.log('❌ 네트워크 실패 - 오프라인 상태');
+              
+              if (event.request.headers.get('accept').includes('text/html')) {
+                return caches.match('/index.html');
+              }
+              
+              if (event.request.headers.get('accept').includes('image')) {
+                return caches.match('/assets/pics/dunlopillo_logo.png');
+              }
+              
+              return new Response('오프라인 상태입니다', {
+                status: 503,
+                statusText: 'Service Unavailable'
+              });
+            });
+        })
+    );
+  }
 });
 
 // 📱 PWA 설치 가능 알림
@@ -309,4 +358,4 @@ function openDB() {
   });
 }
 
-console.log('✅ Service Worker 로드 완료 (Background Sync 포함)');
+console.log('✅ Service Worker 로드 완료 (스마트 캐싱: Network First + Background Sync)');
