@@ -409,6 +409,13 @@ class SurveyDataManager {
     console.log('📤 [SurveyDataManager] Google Sheets 전송 시도:', this._apiEndpoint);
     console.log('📤 [SurveyDataManager] 전송 데이터:', data);
     
+    // 🌐 온라인 상태 확인
+    if (!navigator.onLine) {
+      console.log('📡 [SurveyDataManager] 오프라인 상태 - 로컬 저장');
+      await this._saveOfflineData(data);
+      return { success: true, offline: true, message: '오프라인 상태 - 데이터 로컬 저장됨' };
+    }
+    
     return new Promise((resolve, reject) => {
       try {
         // 임시 iframe 생성 (새 창 대신 숨겨진 iframe 사용)
@@ -529,6 +536,191 @@ class SurveyDataManager {
       isComplete: this._isSurveyComplete(),
       isDataSent: this._isDataSent
     };
+  }
+
+  /**
+   * 오프라인 데이터 저장 (Service Worker에게 전달)
+   * @private
+   * @param {Object} data - 저장할 데이터
+   * @returns {Promise<void>}
+   */
+  async _saveOfflineData(data) {
+    try {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // Service Worker에게 데이터 저장 요청
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SAVE_OFFLINE_DATA',
+          payload: {
+            apiUrl: this._apiEndpoint,
+            payload: data,
+            timestamp: Date.now(),
+            source: 'survey-data-manager'
+          }
+        });
+        
+        console.log('💾 [SurveyDataManager] 오프라인 데이터 저장 요청 전송');
+        
+        // 사용자에게 알림
+        this._showOfflineNotification();
+      } else {
+        // Service Worker가 없으면 localStorage에 임시 저장
+        console.warn('⚠️ [SurveyDataManager] Service Worker 없음 - localStorage 사용');
+        this._saveToLocalStorage(data);
+      }
+    } catch (error) {
+      console.error('❌ [SurveyDataManager] 오프라인 데이터 저장 실패:', error);
+      // 대안: localStorage 저장
+      this._saveToLocalStorage(data);
+    }
+  }
+
+  /**
+   * localStorage에 임시 저장 (Service Worker 대안)
+   * @private
+   * @param {Object} data
+   */
+  _saveToLocalStorage(data) {
+    try {
+      const offlineData = JSON.parse(localStorage.getItem('dunlopillo_offline_data') || '[]');
+      offlineData.push({
+        ...data,
+        timestamp: Date.now(),
+        synced: false
+      });
+      
+      // 최대 100개까지만 저장 (메모리 관리)
+      if (offlineData.length > 100) {
+        offlineData.splice(0, offlineData.length - 100);
+      }
+      
+      localStorage.setItem('dunlopillo_offline_data', JSON.stringify(offlineData));
+      console.log('💾 [SurveyDataManager] localStorage 저장 완료');
+      
+      this._showOfflineNotification();
+    } catch (error) {
+      console.error('❌ [SurveyDataManager] localStorage 저장 실패:', error);
+    }
+  }
+
+  /**
+   * 오프라인 상태 알림 표시
+   * @private
+   */
+  _showOfflineNotification() {
+    const notification = document.createElement('div');
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #FF9800;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideInRight 0.3s ease;
+      ">
+        📡 오프라인 상태<br>
+        <small>WiFi 연결 시 자동 전송됩니다</small>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // 3초 후 제거
+    setTimeout(() => {
+      notification.style.animation = 'slideOutRight 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  /**
+   * 온라인 상태에서 미동기화 데이터 확인 및 전송
+   * @public
+   */
+  async syncPendingData() {
+    if (!navigator.onLine) {
+      console.log('📡 [SurveyDataManager] 여전히 오프라인 상태');
+      return;
+    }
+    
+    try {
+      // localStorage에서 미동기화 데이터 확인
+      const offlineData = JSON.parse(localStorage.getItem('dunlopillo_offline_data') || '[]');
+      const pendingData = offlineData.filter(item => !item.synced);
+      
+      if (pendingData.length === 0) {
+        console.log('✅ [SurveyDataManager] 동기화할 데이터 없음');
+        return;
+      }
+      
+      console.log(`📤 [SurveyDataManager] ${pendingData.length}개 데이터 동기화 시작`);
+      
+      for (let i = 0; i < pendingData.length; i++) {
+        const data = pendingData[i];
+        try {
+          // 실제 전송 시도
+          await this._sendToGoogleSheets(data);
+          
+          // 성공 시 동기화 완료 표시
+          data.synced = true;
+          data.syncedAt = Date.now();
+          
+          console.log(`✅ [SurveyDataManager] 데이터 ${i + 1}/${pendingData.length} 동기화 완료`);
+        } catch (error) {
+          console.error(`❌ [SurveyDataManager] 데이터 ${i + 1} 동기화 실패:`, error);
+        }
+      }
+      
+      // localStorage 업데이트
+      localStorage.setItem('dunlopillo_offline_data', JSON.stringify(offlineData));
+      
+      // 성공 알림
+      this._showSyncSuccessNotification(pendingData.filter(d => d.synced).length);
+      
+    } catch (error) {
+      console.error('❌ [SurveyDataManager] 데이터 동기화 실패:', error);
+    }
+  }
+
+  /**
+   * 동기화 성공 알림
+   * @private
+   * @param {number} count
+   */
+  _showSyncSuccessNotification(count) {
+    if (count === 0) return;
+    
+    const notification = document.createElement('div');
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideInRight 0.3s ease;
+      ">
+        ✅ 데이터 동기화 완료<br>
+        <small>${count}개 데이터 전송됨</small>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideOutRight 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
   }
 
   /**
@@ -678,7 +870,41 @@ class SurveyDataManager {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     console.log('📄 [SurveyDataManager] DOM 로드 완료');
+    setupOfflineHandlers();
   });
 } else {
   console.log('📄 [SurveyDataManager] DOM 이미 로드됨');
+  setupOfflineHandlers();
+}
+
+/**
+ * 오프라인 상태 처리 설정
+ */
+function setupOfflineHandlers() {
+  // 온라인 상태가 되면 자동 동기화 시도
+  window.addEventListener('online', () => {
+    console.log('🌐 [SurveyDataManager] 온라인 상태 복구 - 자동 동기화 시작');
+    
+    // 잠시 대기 후 동기화 (네트워크 안정성 확보)
+    setTimeout(() => {
+      if (window.surveyDataManager && typeof window.surveyDataManager.syncPendingData === 'function') {
+        window.surveyDataManager.syncPendingData();
+      }
+    }, 2000);
+  });
+
+  window.addEventListener('offline', () => {
+    console.log('📡 [SurveyDataManager] 오프라인 상태 - 로컬 저장 모드');
+  });
+
+  // 페이지 로드 시 온라인 상태면 기존 데이터 동기화 확인
+  if (navigator.onLine) {
+    setTimeout(() => {
+      if (window.surveyDataManager && typeof window.surveyDataManager.syncPendingData === 'function') {
+        window.surveyDataManager.syncPendingData();
+      }
+    }, 5000); // 앱 초기화 완료 후 실행
+  }
+  
+  console.log('✅ [SurveyDataManager] 오프라인 핸들러 설정 완료');
 }

@@ -1571,5 +1571,172 @@
       // 주기적으로 업데이트 (추가 안전장치)
       setInterval(updateScreenSizeDebug, 1000);
     </script>
+
+    <!-- 🚀 PWA Service Worker 등록 -->
+    <script>
+      // Service Worker 등록
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+              console.log('✅ Service Worker 등록 성공:', registration.scope);
+              
+              // 업데이트 감지
+              registration.addEventListener('updatefound', () => {
+                console.log('🔄 Service Worker 업데이트 감지');
+                const newWorker = registration.installing;
+                
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('🆕 새 버전 사용 가능 - 페이지 새로고침 권장');
+                    
+                    // 자동 업데이트 (선택적)
+                    if (confirm('새 버전이 사용 가능합니다. 지금 업데이트하시겠습니까?')) {
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.error('❌ Service Worker 등록 실패:', error);
+            });
+        });
+
+        // Service Worker 메시지 수신
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'SW_UPDATED') {
+            window.location.reload();
+          }
+        });
+      } else {
+        console.warn('⚠️ Service Worker를 지원하지 않는 브라우저입니다');
+      }
+
+      // 📱 PWA 설치 프롬프트
+      let deferredPrompt;
+      let installButton;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('📱 PWA 설치 가능');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // 설치 버튼 표시 (선택적)
+        showInstallButton();
+      });
+
+      window.addEventListener('appinstalled', () => {
+        console.log('✅ PWA 설치 완료');
+        deferredPrompt = null;
+        hideInstallButton();
+      });
+
+      function showInstallButton() {
+        // 설치 버튼이 없으면 생성
+        if (!installButton) {
+          installButton = document.createElement('button');
+          installButton.textContent = '📱 앱 설치';
+          installButton.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: #1e40af;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+          `;
+          
+          installButton.addEventListener('mouseover', () => {
+            installButton.style.background = '#3b82f6';
+            installButton.style.transform = 'scale(1.05)';
+          });
+          
+          installButton.addEventListener('mouseout', () => {
+            installButton.style.background = '#1e40af';
+            installButton.style.transform = 'scale(1)';
+          });
+          
+          installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+              deferredPrompt.prompt();
+              const { outcome } = await deferredPrompt.userChoice;
+              console.log(`📱 PWA 설치 결과: ${outcome}`);
+              deferredPrompt = null;
+              hideInstallButton();
+            }
+          });
+          
+          document.body.appendChild(installButton);
+        }
+        
+        installButton.style.display = 'block';
+      }
+
+      function hideInstallButton() {
+        if (installButton) {
+          installButton.style.display = 'none';
+        }
+      }
+
+      // 오프라인/온라인 상태 감지
+      window.addEventListener('online', () => {
+        console.log('🌐 온라인 상태');
+        showConnectionStatus('온라인', '#4CAF50');
+      });
+
+      window.addEventListener('offline', () => {
+        console.log('📡 오프라인 상태');
+        showConnectionStatus('오프라인 모드', '#FF9800');
+      });
+
+      function showConnectionStatus(message, color) {
+        const statusDiv = document.createElement('div');
+        statusDiv.textContent = message;
+        statusDiv.style.cssText = `
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: ${color};
+          color: white;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: bold;
+          z-index: 10000;
+          animation: slideDown 0.3s ease;
+        `;
+        
+        document.body.appendChild(statusDiv);
+        
+        setTimeout(() => {
+          statusDiv.style.animation = 'slideUp 0.3s ease';
+          setTimeout(() => statusDiv.remove(), 300);
+        }, 3000);
+      }
+
+      // CSS 애니메이션 추가
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideDown {
+          from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+          to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateX(-50%) translateY(0); opacity: 1; }
+          to { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
   </body>
 </html>
