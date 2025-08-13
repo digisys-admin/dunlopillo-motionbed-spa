@@ -763,11 +763,20 @@ class SurveyDataManager {
     
     // 잠시 후 새로운 세션을 위해 데이터 초기화
     setTimeout(() => {
+      // 🔄 사용자 ID 강제 재생성 (sessionStorage 초기화)
+      sessionStorage.removeItem('dunlopillo_user_id');
       this._userId = this._generateUserId();
+      
       this._sessionStart = new Date();
       this._surveyData = { gender: null, experience: null, age: null };
       this._ratingsData = { page5: null, page8: null, page12: null, page18: null };
+      
+      // 로컬 스토리지 임시 데이터도 정리
+      localStorage.removeItem('dunlopillo_survey_data');
+      localStorage.removeItem('dunlopillo_ratings_data');
+      
       console.log('🔄 [SurveyDataManager] 새 세션 준비 완료');
+      console.log(`🆔 [NewSession] 새 사용자 ID: ${this._userId}`);
     }, 3000); // 3초 후 초기화
   }
 
@@ -829,12 +838,14 @@ class SurveyDataManager {
     return {
       tabletId: this._tabletId,
       userId: this._userId,
+      sessionId: `${this._userId}_${this._sessionStart.getTime()}`, // 🔄 고유 세션 식별자 추가
       survey: { ...this._surveyData },
       ratings: { ...this._ratingsData },
       sessionStart: this._sessionStart.toISOString(),
       sessionEnd: sessionEnd ? sessionEnd.toISOString() : null,
       ipAddress: this._getLocalIP(),
       browserInfo: this._getBrowserInfo(),
+      deviceType: this._detectDeviceType(), // 🔄 디바이스 타입 추가
       isFinal: isFinal,
       timestamp: new Date().toISOString()
     };
@@ -1047,11 +1058,27 @@ class SurveyDataManager {
   _saveToLocalStorage(data) {
     try {
       const offlineData = JSON.parse(localStorage.getItem('dunlopillo_offline_data') || '[]');
-      offlineData.push({
+      
+      // 🔄 동일 세션 데이터 중복 체크
+      const sessionId = data.sessionId || `${data.userId}_${data.timestamp}`;
+      const existingIndex = offlineData.findIndex(item => item.sessionId === sessionId);
+      
+      const newDataItem = {
         ...data,
+        sessionId: sessionId,
         timestamp: Date.now(),
         synced: false
-      });
+      };
+      
+      if (existingIndex >= 0) {
+        // 🔄 기존 세션 데이터 업데이트 (덮어쓰기)
+        console.log(`🔄 [OfflineStorage] 기존 세션 데이터 업데이트: ${sessionId}`);
+        offlineData[existingIndex] = newDataItem;
+      } else {
+        // 🆕 새 세션 데이터 추가
+        console.log(`🆕 [OfflineStorage] 새 세션 데이터 추가: ${sessionId}`);
+        offlineData.push(newDataItem);
+      }
       
       // 최대 100개까지만 저장 (메모리 관리)
       if (offlineData.length > 100) {
@@ -1060,6 +1087,7 @@ class SurveyDataManager {
       
       localStorage.setItem('dunlopillo_offline_data', JSON.stringify(offlineData));
       console.log('💾 [SurveyDataManager] localStorage 저장 완료');
+      console.log(`📊 [OfflineStorage] 총 ${offlineData.length}개 세션 저장됨`);
       
       this._showOfflineNotification();
     } catch (error) {
