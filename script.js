@@ -940,7 +940,7 @@ class MotionBedApp {
             alt="Dunlopillo Logo"
             loading="lazy"
           />
-          <div class="motion-bed" style="z-index: 6;">자연에서온 편안함, 던롭필로 침대</div>
+          <div class="motion-bed" style="z-index: 6;">자연에서온 편안함, 던롭필로침대</div>
           <div class="buttons home-start-button" style="z-index: 6; cursor: pointer;">
             <div class="label">화면을 터치하시면 체험이 시작됩니다</div>
           </div>
@@ -987,8 +987,8 @@ class MotionBedApp {
           id="homeBackgroundVideo" 
           src="${startVideo}"
           autoplay 
-          muted 
           playsinline 
+          loop
           style="width: 100%; height: 100%; object-fit: cover;">
         </video>
       </div>

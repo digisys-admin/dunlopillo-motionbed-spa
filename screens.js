@@ -697,7 +697,7 @@ const screens = {
   // 홈 화면
   'home': {
     type: 'main',
-    title: '자연에서온 편안함, 던롭필로 침대',
+    title: '자연에서온 편안함, 던롭필로침대',
     bg: '',
     button: '화면을 터치하시면 체험이 시작됩니다'
   },
