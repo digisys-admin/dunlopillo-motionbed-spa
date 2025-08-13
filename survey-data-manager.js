@@ -105,23 +105,237 @@ class SurveyDataManager {
   }
 
   /**
-   * 테블릿 ID 생성
+   * 디바이스 타입 감지
+   * @private
+   * @returns {string}
+   */
+  _detectDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    const platform = navigator.platform.toLowerCase();
+    
+    // 1. 터치 지원 여부 확인
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // 2. 화면 크기 확인
+    const screenWidth = screen.width;
+    const screenHeight = screen.height;
+    const maxDimension = Math.max(screenWidth, screenHeight);
+    const minDimension = Math.min(screenWidth, screenHeight);
+    
+    // 3. User Agent 기반 디바이스 판별
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+    const isTablet = /ipad|android(?!.*mobile)|tablet/i.test(ua) || 
+                    (hasTouch && minDimension >= 768 && maxDimension >= 1024);
+    const isIOS = /ipad|iphone|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+    
+    // 4. 화면 비율 및 크기 기반 판별
+    const aspectRatio = maxDimension / minDimension;
+    const isLargeScreen = minDimension >= 1200; // 데스크톱/노트북
+    const isMediumScreen = minDimension >= 768 && minDimension < 1200; // 태블릿
+    const isSmallScreen = minDimension < 768; // 모바일
+    
+    // 5. 포인터 정밀도 확인 (CSS Media Query 지원 시)
+    let hasFinePrinter = false;
+    try {
+      hasFinePrinter = window.matchMedia('(pointer: fine)').matches;
+    } catch (e) {
+      // 지원하지 않는 브라우저는 User Agent로 판단
+      hasFinePrinter = !hasTouch;
+    }
+    
+    // 6. 디바이스 타입 결정 로직
+    let deviceType = 'UNKNOWN';
+    let confidence = 'LOW';
+    
+    // iPad 또는 Android 태블릿 명시적 감지
+    if (isIOS && ua.includes('ipad')) {
+      deviceType = 'TABLET';
+      confidence = 'HIGH';
+    }
+    // Android 태블릿 (mobile이 없고 tablet이 있거나 화면이 큰 경우)
+    else if (isAndroid && !ua.includes('mobile') && (ua.includes('tablet') || isMediumScreen)) {
+      deviceType = 'TABLET';
+      confidence = 'HIGH';
+    }
+    // 스마트폰 감지
+    else if (isMobile && isSmallScreen) {
+      deviceType = 'MOBILE';
+      confidence = 'HIGH';
+    }
+    // 대형 화면 + 마우스/트랙패드 = 데스크톱/노트북
+    else if (isLargeScreen && hasFinePrinter && !hasTouch) {
+      deviceType = 'LAPTOP';
+      confidence = 'HIGH';
+    }
+    // 중간 화면 + 터치 = 태블릿 가능성
+    else if (isMediumScreen && hasTouch) {
+      deviceType = 'TABLET';
+      confidence = 'MEDIUM';
+    }
+    // 중간 화면 + 마우스 = 노트북 가능성
+    else if (isMediumScreen && hasFinePrinter) {
+      deviceType = 'LAPTOP';
+      confidence = 'MEDIUM';
+    }
+    // 큰 화면 + 터치 = 터치 노트북 또는 대형 태블릿
+    else if (isLargeScreen && hasTouch) {
+      // Surface Pro 같은 경우 - 화면 비율로 추가 판별
+      if (aspectRatio > 1.5) {
+        deviceType = 'LAPTOP'; // 16:9, 16:10 비율은 노트북
+      } else {
+        deviceType = 'TABLET'; // 4:3, 3:2 비율은 태블릿
+      }
+      confidence = 'MEDIUM';
+    }
+    // Windows/macOS/Linux + 큰 화면 = 데스크톱/노트북
+    else if ((platform.includes('win') || platform.includes('mac') || platform.includes('linux')) && isLargeScreen) {
+      deviceType = 'LAPTOP';
+      confidence = 'MEDIUM';
+    }
+    // 기본값: 화면 크기 기반
+    else {
+      if (isSmallScreen) {
+        deviceType = 'MOBILE';
+      } else if (isMediumScreen) {
+        deviceType = 'TABLET';
+      } else {
+        deviceType = 'LAPTOP';
+      }
+      confidence = 'LOW';
+    }
+    
+    // 디버깅 정보 출력
+    console.log(`📱 [DeviceDetection] 감지 결과:`, {
+      deviceType,
+      confidence,
+      details: {
+        userAgent: ua.substring(0, 100) + '...',
+        platform,
+        screenSize: `${screenWidth}x${screenHeight}`,
+        hasTouch,
+        hasFinePrinter,
+        aspectRatio: aspectRatio.toFixed(2),
+        classifications: {
+          isMobile,
+          isTablet,
+          isIOS,
+          isAndroid,
+          isLargeScreen,
+          isMediumScreen,
+          isSmallScreen
+        }
+      }
+    });
+    
+    return `${deviceType}-${confidence}`;
+  }
+
+  /**
+   * 디바이스 타입 감지 (신뢰도 포함)
+   * @private
+   * @returns {string} - "TABLET-HIGH", "LAPTOP-MEDIUM" 등
+   */
+  _detectDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    const platform = navigator.platform.toLowerCase();
+    
+    // 터치 지원 확인
+    const hasTouch = ('ontouchstart' in window) || 
+                     (navigator.maxTouchPoints > 0) || 
+                     (navigator.msMaxTouchPoints > 0);
+    
+    // 화면 크기 확인
+    const screenWidth = screen.width;
+    const screenHeight = screen.height;
+    const screenSize = Math.max(screenWidth, screenHeight);
+    const screenRatio = Math.max(screenWidth, screenHeight) / Math.min(screenWidth, screenHeight);
+    
+    console.log(`🔍 [DeviceDetection] UA: ${ua.substring(0, 50)}...`);
+    console.log(`🔍 [DeviceDetection] Platform: ${platform}`);
+    console.log(`🔍 [DeviceDetection] Touch: ${hasTouch}, Screen: ${screenWidth}x${screenHeight}`);
+    
+    // 1. 명확한 모바일 기기 (스마트폰)
+    if (/android.*mobile|iphone|ipod|blackberry|windows phone|webos/i.test(ua)) {
+      return 'MOBILE-HIGH';
+    }
+    
+    // 2. 명확한 태블릿
+    if (/ipad|kindle|silk|playbook/i.test(ua)) {
+      return 'TABLET-HIGH';
+    }
+    
+    // 3. Android 태블릿 (mobile이 없는 Android)
+    if (/android/i.test(ua) && !/mobile/i.test(ua)) {
+      return 'TABLET-HIGH';
+    }
+    
+    // 4. 화면 크기와 터치 기반 추론
+    if (hasTouch) {
+      if (screenSize <= 768) {
+        return 'MOBILE-MEDIUM'; // 작은 터치 화면
+      } else if (screenSize <= 1024) {
+        return 'TABLET-MEDIUM'; // 중간 터치 화면
+      } else if (screenSize <= 1366) {
+        return 'TABLET-LOW'; // 큰 태블릿 또는 터치 노트북
+      } else {
+        return 'LAPTOP-MEDIUM'; // 터치 노트북/올인원
+      }
+    }
+    
+    // 5. 터치 없는 기기 (데스크탑/노트북)
+    if (screenSize <= 1366) {
+      return 'LAPTOP-HIGH'; // 노트북 해상도
+    } else if (screenSize <= 1920) {
+      return 'LAPTOP-MEDIUM'; // 큰 노트북 또는 작은 데스크탑
+    } else {
+      return 'DESKTOP-HIGH'; // 데스크탑
+    }
+  }
+
+  /**
+   * 테블릿 ID 생성 (디바이스 고유 식별)
    * @private
    * @returns {string}
    */
   _generateTabletId() {
-    // URL 파라미터에서 테블릿 ID 확인
+    // 1. URL 파라미터에서 테블릿 ID 확인 (?tablet=KIOSK1, ?t=A)
     const urlParams = new URLSearchParams(window.location.search);
     const tabletId = urlParams.get('tablet') || urlParams.get('t');
     
     if (tabletId) {
-      return `TABLET_${tabletId.toUpperCase()}`;
+      // URL 파라미터로 명시적 지정 시에도 디바이스 타입 추가
+      const deviceType = this._detectDeviceType().split('-')[0]; // HIGH/MEDIUM/LOW 제거
+      const deviceId = `${deviceType}_${tabletId.toUpperCase()}`;
+      localStorage.setItem('dunlopillo_device_id', deviceId); // 영구 저장
+      return deviceId;
     }
     
-    // IP 주소 기반 ID 생성
-    const ip = this._getLocalIP();
-    const hash = this._generateHash(ip + navigator.userAgent);
-    return `TABLET_${hash.substring(0, 8).toUpperCase()}`;
+    // 2. 기존에 저장된 디바이스 ID 확인 (localStorage - 브라우저 재시작 후에도 유지)
+    const storedDeviceId = localStorage.getItem('dunlopillo_device_id');
+    if (storedDeviceId && (storedDeviceId.startsWith('TABLET_') || 
+                          storedDeviceId.startsWith('LAPTOP_') || 
+                          storedDeviceId.startsWith('MOBILE_') || 
+                          storedDeviceId.startsWith('DESKTOP_'))) {
+      return storedDeviceId;
+    }
+    
+    // 3. 디바이스 타입 감지
+    const deviceTypeWithConfidence = this._detectDeviceType();
+    const deviceType = deviceTypeWithConfidence.split('-')[0]; // TABLET, LAPTOP, MOBILE, DESKTOP
+    
+    // 4. 디바이스 지문(fingerprint) 생성 - 브라우저/기기별 고유값
+    const deviceFingerprint = this._generateDeviceFingerprint();
+    const hash = this._generateHash(deviceFingerprint);
+    const newDeviceId = `${deviceType}_${hash.substring(0, 8).toUpperCase()}`;
+    
+    // 5. 생성된 ID를 localStorage에 영구 저장
+    localStorage.setItem('dunlopillo_device_id', newDeviceId);
+    console.log(`🆔 [Device] 새 디바이스 ID 생성: ${newDeviceId}`);
+    console.log(`📱 [Device] 디바이스 타입: ${deviceType} (${deviceTypeWithConfidence})`);
+    console.log(`🔍 [Device] 디바이스 지문: ${deviceFingerprint.substring(0, 50)}...`);
+    
+    return newDeviceId;
   }
 
   /**
@@ -145,17 +359,268 @@ class SurveyDataManager {
   }
 
   /**
-   * 로컬 IP 주소 추정
+   * 디바이스 타입 감지
+   * @private
+   * @returns {string}
+   */
+  _detectDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    const maxTouchPoints = navigator.maxTouchPoints || 0;
+    const screenWidth = screen.width;
+    const screenHeight = screen.height;
+    
+    // 1. 모바일 디바이스 감지 (우선순위)
+    if (/iphone|ipod|android.*mobile|windows phone|blackberry|mobile/i.test(ua)) {
+      return 'Mobile';
+    }
+    
+    // 2. 태블릿 감지
+    if (/ipad|android(?!.*mobile)|tablet|kindle|silk|playbook/i.test(ua)) {
+      return 'Tablet';
+    }
+    
+    // 3. 터치 지원 여부와 화면 크기로 태블릿 추가 감지
+    if (maxTouchPoints > 0) {
+      // 터치 지원 + 중간 화면 크기 = 태블릿 가능성
+      if (screenWidth >= 768 && screenWidth <= 1366) {
+        return 'Tablet';
+      }
+      // 터치 지원 + 작은 화면 = 모바일
+      if (screenWidth < 768) {
+        return 'Mobile';
+      }
+    }
+    
+    // 4. 노트북/데스크톱 구분
+    // 일반적으로 노트북은 1920px 이하, 데스크톱은 그 이상
+    if (screenWidth <= 1920 && screenHeight <= 1200) {
+      return 'Laptop';
+    }
+    
+    // 5. 기본값: Desktop
+    return 'Desktop';
+  }
+
+  /**
+   * 디바이스 지문 생성 (브라우저/기기별 고유 식별)
+   * @private
+   * @returns {string}
+   */
+  _generateDeviceFingerprint() {
+    const components = [];
+    
+    // 1. 화면 해상도 및 색상 깊이
+    components.push(`screen:${screen.width}x${screen.height}x${screen.colorDepth}`);
+    
+    // 2. 시간대
+    components.push(`timezone:${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+    
+    // 3. 언어 설정
+    components.push(`lang:${navigator.language}`);
+    
+    // 4. 플랫폼 정보
+    components.push(`platform:${navigator.platform}`);
+    
+    // 5. User Agent (축약)
+    const ua = navigator.userAgent;
+    const uaHash = this._generateHash(ua).substring(0, 8);
+    components.push(`ua:${uaHash}`);
+    
+    // 6. 현재 호스트/포트
+    components.push(`host:${window.location.host}`);
+    
+    // 7. 하드웨어 동시성 (CPU 코어 수)
+    if (navigator.hardwareConcurrency) {
+      components.push(`hw:${navigator.hardwareConcurrency}`);
+    }
+    
+    // 8. 메모리 정보 (Chrome만 지원)
+    if (navigator.deviceMemory) {
+      components.push(`mem:${navigator.deviceMemory}`);
+    }
+    
+    // 9. 로컬 IP (개선된 감지)
+    // 이전에 WebRTC로 감지된 IP가 있으면 사용
+    const detectedIP = localStorage.getItem('dunlopillo_detected_ip');
+    const currentIP = detectedIP || this._getLocalIP();
+    components.push(`ip:${currentIP}`);
+    
+    // 10. Canvas Fingerprinting (간단한 버전)
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Dunlopillo Device ID', 2, 2);
+      const canvasData = canvas.toDataURL();
+      const canvasHash = this._generateHash(canvasData).substring(0, 8);
+      components.push(`canvas:${canvasHash}`);
+    } catch (e) {
+      components.push('canvas:unsupported');
+    }
+    
+    const fingerprint = components.join('|');
+    console.log(`🔍 [DeviceFingerprint] 생성된 지문: ${fingerprint}`);
+    
+    // 지문을 localStorage에도 저장 (IP 업데이트 시 참조용)
+    localStorage.setItem('dunlopillo_device_fingerprint', fingerprint);
+    
+    return fingerprint;
+  }
+
+  /**
+   * 로컬 IP 주소 추정 (개선된 버전)
    * @private
    * @returns {string}
    */
   _getLocalIP() {
-    // 현재 접속 중인 IP 추정 (Live Server 기준)
+    // 1. 현재 접속 중인 호스트 확인
     const host = window.location.hostname;
-    if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+    
+    // 2. 이미 로컬 네트워크 IP로 접속 중이면 사용
+    if (host.startsWith('192.168.') || host.startsWith('10.') || 
+        host.startsWith('172.16.') || host.startsWith('172.17.') || 
+        host.startsWith('172.18.') || host.startsWith('172.19.') ||
+        host.startsWith('172.2') || host.startsWith('172.3')) {
       return host;
     }
-    return 'localhost';
+    
+    // 3. localhost/127.0.0.1인 경우 실제 IP 추정 시도
+    if (host === 'localhost' || host === '127.0.0.1' || host === '') {
+      // WebRTC를 이용한 로컬 IP 감지 시도 (비동기이므로 즉시 반환은 불가)
+      this._detectLocalIPAsync();
+      
+      // 일반적인 개발 환경 IP 추정
+      const now = new Date();
+      const timeHash = now.getHours() + now.getMinutes();
+      
+      // 시간 기반으로 일반적인 로컬 IP 대역 중 하나 선택
+      const commonIPs = ['192.168.1.', '192.168.0.', '10.0.0.', '172.16.0.'];
+      const selectedPrefix = commonIPs[timeHash % commonIPs.length];
+      
+      // 100-200 사이의 숫자로 IP 완성 (중복 가능성 낮춤)
+      const lastOctet = 100 + (timeHash % 100);
+      return `${selectedPrefix}${lastOctet}`;
+    }
+    
+    // 4. 기타 경우 호스트명 그대로 반환
+    return host;
+  }
+
+  /**
+   * WebRTC를 이용한 실제 로컬 IP 감지 (비동기)
+   * @private
+   */
+  _detectLocalIPAsync() {
+    try {
+      // WebRTC RTCPeerConnection을 이용한 로컬 IP 감지
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+      
+      pc.createDataChannel('');
+      
+      pc.onicecandidate = (event) => {
+        if (event && event.candidate && event.candidate.candidate) {
+          const candidate = event.candidate.candidate;
+          const match = candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+          
+          if (match && match[1]) {
+            const detectedIP = match[1];
+            // 로컬 네트워크 IP인지 확인
+            if (detectedIP.startsWith('192.168.') || 
+                detectedIP.startsWith('10.') || 
+                detectedIP.startsWith('172.')) {
+              
+              console.log(`🌐 [IP감지] WebRTC로 감지된 로컬 IP: ${detectedIP}`);
+              
+              // 감지된 IP를 localStorage에 저장 (다음번 사용)
+              localStorage.setItem('dunlopillo_detected_ip', detectedIP);
+              
+              // 디바이스 ID 재생성 (더 정확한 IP 반영)
+              this._updateDeviceIdWithIP(detectedIP);
+            }
+          }
+        }
+      };
+      
+      pc.createOffer()
+        .then(offer => pc.setLocalDescription(offer))
+        .catch(err => console.log('🌐 [IP감지] WebRTC 실패:', err));
+        
+    } catch (error) {
+      console.log('🌐 [IP감지] WebRTC 지원하지 않음:', error.message);
+    }
+  }
+
+  /**
+   * 감지된 IP로 디바이스 ID 업데이트
+   * @private
+   * @param {string} detectedIP 
+   */
+  _updateDeviceIdWithIP(detectedIP) {
+    try {
+      // 기존 저장된 디바이스 ID가 있고, URL 파라미터로 지정되지 않은 경우만 업데이트
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasTabletParam = urlParams.get('tablet') || urlParams.get('t');
+      
+      if (!hasTabletParam) {
+        const currentDeviceId = localStorage.getItem('dunlopillo_device_id');
+        let deviceType = 'TABLET'; // 기본값
+        
+        // 기존 디바이스 ID에서 타입 추출
+        if (currentDeviceId) {
+          if (currentDeviceId.startsWith('TABLET_')) {
+            deviceType = 'TABLET';
+          } else if (currentDeviceId.startsWith('LAPTOP_')) {
+            deviceType = 'LAPTOP';
+          } else if (currentDeviceId.startsWith('MOBILE_')) {
+            deviceType = 'MOBILE';
+          } else {
+            // 새로운 감지 실행
+            deviceType = this._detectDeviceType().split('-')[0];
+          }
+        } else {
+          // 새로운 감지 실행
+          deviceType = this._detectDeviceType().split('-')[0];
+        }
+        
+        // 새로운 디바이스 지문 생성 (감지된 IP 포함)
+        const oldFingerprint = localStorage.getItem('dunlopillo_device_fingerprint');
+        const newComponents = [];
+        
+        // 기존 구성요소들 유지하되 IP만 업데이트
+        if (oldFingerprint) {
+          const parts = oldFingerprint.split('|');
+          parts.forEach(part => {
+            if (part.startsWith('ip:')) {
+              newComponents.push(`ip:${detectedIP}`);
+            } else {
+              newComponents.push(part);
+            }
+          });
+        } else {
+          // 새로 생성
+          const deviceFingerprint = this._generateDeviceFingerprint();
+          newComponents.push(deviceFingerprint.replace(/ip:[^|]+/, `ip:${detectedIP}`));
+        }
+        
+        const updatedFingerprint = newComponents.join('|');
+        const hash = this._generateHash(updatedFingerprint);
+        const newDeviceId = `${deviceType}_${hash.substring(0, 8).toUpperCase()}`;
+        
+        // 업데이트된 정보 저장
+        localStorage.setItem('dunlopillo_device_id', newDeviceId);
+        localStorage.setItem('dunlopillo_device_fingerprint', updatedFingerprint);
+        
+        console.log(`🆔 [IP업데이트] 디바이스 ID 갱신: ${newDeviceId} (타입: ${deviceType}, IP: ${detectedIP})`);
+        
+        // 현재 인스턴스의 태블릿 ID도 업데이트
+        this._tabletId = newDeviceId;
+      }
+    } catch (error) {
+      console.error('❌ [IP업데이트] 디바이스 ID 업데이트 실패:', error);
+    }
   }
 
   /**
