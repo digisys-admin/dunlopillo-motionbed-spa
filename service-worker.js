@@ -3,18 +3,22 @@
  * 오프라인 기능 및 캐싱 관리
  */
 
-const CACHE_NAME = 'dunlopillo-spa-v1.3.0';
+const CACHE_NAME = 'dunlopillo-spa-v1.4.0';
 
 // 🎯 핵심 파일들 - Network First 전략 (WiFi 연결 시 항상 최신 버전 확인)
+// ✅ 모든 코드, 콘텐츠, 스타일 파일들 포함 (글귀, 스타일 변경사항 즉시 반영)
 const NETWORK_FIRST_URLS = [
   '/',
   '/index.html',
   '/styles.css',
   '/script.js',
-  '/screens.js',
-  '/survey-data-manager.js',
-  '/survey-data.js',
-  '/manifest.json'
+  '/screens.js',              // 🎯 페이지 콘텐츠 및 글귀
+  '/survey-data-manager.js',   // 🎯 설문 데이터 관리 로직
+  '/survey-data.js',          // 🎯 설문 데이터 구조
+  '/manifest.json',
+  '/cache-manager.js',        // 🎯 캐시 관리 로직
+  '/image-preloader.js',      // 🎯 이미지 프리로더
+  '/service-worker.js'        // 🎯 Service Worker 자체도 업데이트 대상
 ];
 
 // 📦 캐시 우선 파일들 - Cache First 전략 (미디어 파일들)
