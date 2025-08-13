@@ -3,7 +3,7 @@
  * 오프라인 기능 및 캐싱 관리
  */
 
-const CACHE_NAME = 'dunlopillo-spa-v1.0.0';
+const CACHE_NAME = 'dunlopillo-spa-v1.1.0';
 const CACHE_URLS = [
   '/',
   '/index.html',
@@ -18,6 +18,11 @@ const CACHE_URLS = [
   'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767432/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_01_tt5wqe.mp4',
   'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767434/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_02_n8rnf8.mp4',
   'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767442/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_03_x67vjb.mp4',
+
+  // 배경음악들 (Cloudinary - 오디오로 사용)
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1748237173/Dunlopillo-Crash-Test-Flexibilitet-web_n045ph.mp4',
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1748237657/Dunlopillo-Crash-Test-Stabilitet-web_mvxr27.mp4',
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1748241410/Dunlopillo-Crash-Test-Allergivenlig-A%CC%8Andba%CC%8Ar-web_wxolsb.mp4',
   
   // 이미지 파일들
   '/assets/pics/dunlopillo_logo.png',
