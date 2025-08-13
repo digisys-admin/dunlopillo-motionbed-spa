@@ -14,6 +14,11 @@ const CACHE_URLS = [
   '/survey-data.js',
   '/manifest.json',
   
+  // 홈 화면 동영상들 (Cloudinary)
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767432/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_01_tt5wqe.mp4',
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767434/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_02_n8rnf8.mp4',
+  'https://res.cloudinary.com/di2pd92t1/video/upload/v1753767442/%E1%84%83%E1%85%A5%E1%86%AB%E1%84%85%E1%85%A9%E1%86%B8_video_03_x67vjb.mp4',
+  
   // 이미지 파일들
   '/assets/pics/dunlopillo_logo.png',
   '/assets/pics/dunlopillo_logo_white.png',
@@ -110,13 +115,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Google Drive, Google Sheets API 요청은 항상 네트워크 우선
-  if (event.request.url.includes('drive.google.com') || 
-      event.request.url.includes('script.google.com')) {
+  // Google Drive 동영상은 캐시, Google Sheets API는 네트워크 우선
+  if (event.request.url.includes('script.google.com')) {
+    // Google Sheets API만 네트워크 우선 (설문 데이터 전송용)
     event.respondWith(
       fetch(event.request)
         .catch(() => {
-          console.log('📡 Google API 오프라인 - 기본 응답 제공');
+          console.log('📡 Google Sheets API 오프라인 - 기본 응답 제공');
           return new Response('{"offline": true}', {
             headers: { 'Content-Type': 'application/json' }
           });
