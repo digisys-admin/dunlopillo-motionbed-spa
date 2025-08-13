@@ -28,3 +28,15 @@ build/
 
 # Local Netlify folder
 .netlify
+
+# 임시/테스트 파일들
+temp-*
+debug-*
+test-*
+*-test.*
+*-demo.*
+simple-test.*
+speed-comparison.*
+styles-clean.css
+survey-data-legacy.js
+updated-*
