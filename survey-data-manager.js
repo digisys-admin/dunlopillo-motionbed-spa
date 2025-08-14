@@ -551,8 +551,21 @@ class SurveyDataManager {
    * @private
    */
   _detectLocalIPAsync() {
+    // URL 경로에서 설정된 디바이스 ID가 있으면 IP 감지 비활성화
+    const idLocked = localStorage.getItem('dunlopillo_device_id_locked') === 'true';
+    const idSource = localStorage.getItem('dunlopillo_id_source');
+    
+    if (idLocked && idSource === 'url_path') {
+      console.log('🔒 [IP감지] URL 경로로 설정된 디바이스 ID 있음 - WebRTC IP 감지 비활성화');
+      return;
+    }
+    
     try {
-      // WebRTC RTCPeerConnection을 이용한 로컬 IP 감지
+      // WebRTC RTCPeerConnection을 이용한 로컬 IP 감지 - 비활성화
+      console.log('ℹ️ [IP감지] WebRTC IP 감지 기능 비활성화됨 (URL 경로 방식 활성화)');
+      
+      // 코드 비활성화
+      /*
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
       });
@@ -586,7 +599,7 @@ class SurveyDataManager {
       pc.createOffer()
         .then(offer => pc.setLocalDescription(offer))
         .catch(err => console.log('🌐 [IP감지] WebRTC 실패:', err));
-        
+      */
     } catch (error) {
       console.log('🌐 [IP감지] WebRTC 지원하지 않음:', error.message);
     }

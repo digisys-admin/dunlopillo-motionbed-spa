@@ -3,6 +3,17 @@
 (function() {
   try {
     console.log('🔍 초기 URL 경로 확인 시작 (페이지 로드 전)');
+    
+    // 기존에 자동 감지로 생성된 ID 기록 완전히 삭제 (초기화)
+    // 이렇게 하면 URL 경로 기반 ID가 확실하게 우선 적용됨
+    localStorage.removeItem('dunlopillo_device_id');
+    localStorage.removeItem('dunlopillo_auto_device_id');
+    localStorage.removeItem('dunlopillo_device_id_locked');
+    localStorage.removeItem('dunlopillo_id_source');
+    localStorage.removeItem('dunlopillo_device_fingerprint');
+    localStorage.removeItem('dunlopillo_detected_ip');
+    console.log('🧹 자동 감지 ID 관련 데이터 초기화 완료');
+    
     // URL 경로에서 디바이스 ID 추출
     const path = window.location.pathname;
     console.log('🔍 현재 URL 경로:', path);
