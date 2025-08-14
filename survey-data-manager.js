@@ -299,9 +299,23 @@ class SurveyDataManager {
    * @returns {string}
    */
   _generateTabletId() {
+    console.log('🔍 [Device] 디바이스 ID 생성 시작');
+    
     // 0. localStorage에 저장된 디바이스 ID가 있으면 먼저 확인
-    // (index.html에서 URL 경로로 설정한 경우를 위해)
+    // (URL 경로로 설정한 경우도 이 방식으로 이미 저장되어 있음)
     const storedDeviceId = localStorage.getItem('dunlopillo_device_id');
+    const autoDeviceId = localStorage.getItem('dunlopillo_auto_device_id');
+    
+    // 자동 ID가 설정되어 있으면 그것을 우선 사용 (URL 경로나 파라미터로 설정된 경우)
+    if (autoDeviceId && (autoDeviceId.startsWith('TABLET_') || 
+                        autoDeviceId.startsWith('LAPTOP_') || 
+                        autoDeviceId.startsWith('MOBILE_') || 
+                        autoDeviceId.startsWith('DESKTOP_'))) {
+      console.log(`🔍 [Device] localStorage에서 자동 설정된 디바이스 ID 불러옴: ${autoDeviceId}`);
+      return autoDeviceId;
+    }
+    
+    // 기본 저장된 ID 확인
     if (storedDeviceId && (storedDeviceId.startsWith('TABLET_') || 
                           storedDeviceId.startsWith('LAPTOP_') || 
                           storedDeviceId.startsWith('MOBILE_') || 
