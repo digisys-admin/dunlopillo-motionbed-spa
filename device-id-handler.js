@@ -4,6 +4,16 @@
   try {
     console.log('🔍 초기 URL 경로 확인 시작 (페이지 로드 전)');
     
+    // 인라인 스크립트에서 이미 설정한 ID가 있는지 확인
+    const inlineIdLocked = localStorage.getItem('dunlopillo_device_id_locked') === 'true';
+    const inlineIdSource = localStorage.getItem('dunlopillo_id_source');
+    
+    if (inlineIdLocked && inlineIdSource === 'url_path_inline') {
+      // 인라인 스크립트에서 이미 처리했으므로 종료
+      console.log('🔍 인라인 스크립트에서 이미 디바이스 ID 설정함. 추가 처리 건너뜀');
+      return;
+    }
+    
     // 기존에 자동 감지로 생성된 ID 기록 완전히 삭제 (초기화)
     // 이렇게 하면 URL 경로 기반 ID가 확실하게 우선 적용됨
     localStorage.removeItem('dunlopillo_device_id');

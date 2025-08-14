@@ -306,12 +306,25 @@ class SurveyDataManager {
     const idSource = localStorage.getItem('dunlopillo_id_source');
     
     // 경로로 설정된 ID가 있으면 자동감지 건너뛰기
-    if (idLocked && idSource === 'url_path') {
+    if (idLocked && (idSource === 'url_path' || idSource === 'url_path_inline')) {
       const lockedId = localStorage.getItem('dunlopillo_device_id');
       if (lockedId) {
         console.log(`🔒 [Device] URL 경로로 설정된 디바이스 ID 발견 (잠금): ${lockedId}`);
         return lockedId;
       }
+    }
+    
+    // 페이지 로드 시 자동 실행된 인라인 스크립트에서 설정한 값이 있는지 확인
+    if (window.deviceIdFromPath) {
+      console.log(`🔒 [Device] 인라인 스크립트에서 설정된 디바이스 ID 발견: ${window.deviceIdFromPath}`);
+      
+      // 이미 설정되어 있지만 확실하게 localStorage에도 저장
+      localStorage.setItem('dunlopillo_device_id', window.deviceIdFromPath);
+      localStorage.setItem('dunlopillo_auto_device_id', window.deviceIdFromPath);
+      localStorage.setItem('dunlopillo_device_id_locked', 'true');
+      localStorage.setItem('dunlopillo_id_source', 'url_path_inline');
+      
+      return window.deviceIdFromPath;
     }
     
     // 0. localStorage에 저장된 디바이스 ID가 있으면 먼저 확인

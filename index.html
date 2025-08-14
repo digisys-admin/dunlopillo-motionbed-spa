@@ -4,6 +4,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, minimal-ui" />
     <meta charset="utf-8" />
     
+    <!-- ⚡️ 즉시 실행 인라인 스크립트: URL 경로에서 디바이스 ID 추출 (최우선 실행) -->
+    <script>
+      (function() {
+        try {
+          console.log('[🚀 인라인] URL 경로에서 디바이스 ID 초기 추출 시작');
+          
+          // localStorage 초기화 (자동감지 ID 삭제)
+          localStorage.removeItem('dunlopillo_device_id');
+          localStorage.removeItem('dunlopillo_auto_device_id');
+          localStorage.removeItem('dunlopillo_device_fingerprint');
+          localStorage.removeItem('dunlopillo_detected_ip');
+          
+          // URL 경로에서 디바이스 ID 추출
+          const path = window.location.pathname;
+          if (path !== '/' && path !== '/index.html') {
+            // 경로에서 슬래시 제거하고 ID 추출
+            let deviceId = path.replace(/^\//, '').replace(/\/index\.html$/, '');
+            
+            if (deviceId) {
+              // 대문자 변환 및 접두사 확인
+              deviceId = deviceId.toUpperCase();
+              if (!deviceId.startsWith('TABLET_') && !deviceId.startsWith('LAPTOP_')) {
+                deviceId = 'TABLET_' + deviceId;
+              }
+              
+              console.log('[🚀 인라인] URL 경로에서 디바이스 ID 추출됨:', deviceId);
+              
+              // localStorage에 저장 (최우선)
+              localStorage.setItem('dunlopillo_device_id', deviceId);
+              localStorage.setItem('dunlopillo_auto_device_id', deviceId);
+              localStorage.setItem('dunlopillo_device_id_locked', 'true');
+              localStorage.setItem('dunlopillo_id_source', 'url_path_inline');
+              
+              // 디버깅 정보
+              console.log('[🚀 인라인] ID 저장 완료:', deviceId);
+              
+              // 메모리에도 저장 (localStorage 실패 시 백업)
+              window.deviceIdFromPath = deviceId;
+            }
+          }
+        } catch (e) {
+          console.error('[🚀 인라인] 초기화 오류:', e);
+        }
+      })();
+    </script>
+    
     <!-- 모바일 최적화 메타 태그 -->
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
