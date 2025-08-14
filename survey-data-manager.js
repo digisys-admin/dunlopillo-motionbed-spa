@@ -299,25 +299,37 @@ class SurveyDataManager {
    * @returns {string}
    */
   _generateTabletId() {
-    // 1. URL 파라미터에서 테블릿 ID 확인 (?tablet=KIOSK1, ?t=A)
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabletId = urlParams.get('tablet') || urlParams.get('t');
-    
-    if (tabletId) {
-      // URL 파라미터로 명시적 지정 시에도 디바이스 타입 추가
-      const deviceType = this._detectDeviceType().split('-')[0]; // HIGH/MEDIUM/LOW 제거
-      const deviceId = `${deviceType}_${tabletId.toUpperCase()}`;
-      localStorage.setItem('dunlopillo_device_id', deviceId); // 영구 저장
-      return deviceId;
-    }
-    
-    // 2. 기존에 저장된 디바이스 ID 확인 (localStorage - 브라우저 재시작 후에도 유지)
+    // 0. localStorage에 저장된 디바이스 ID가 있으면 먼저 확인
+    // (index.html에서 URL 경로로 설정한 경우를 위해)
     const storedDeviceId = localStorage.getItem('dunlopillo_device_id');
     if (storedDeviceId && (storedDeviceId.startsWith('TABLET_') || 
                           storedDeviceId.startsWith('LAPTOP_') || 
                           storedDeviceId.startsWith('MOBILE_') || 
                           storedDeviceId.startsWith('DESKTOP_'))) {
+      console.log(`🔍 [Device] localStorage에서 디바이스 ID 불러옴: ${storedDeviceId}`);
       return storedDeviceId;
+    }
+    
+    // 1. URL 파라미터에서 테블릿 ID 확인 (?tablet=KIOSK1, ?t=A, ?presetId=TABLET_01)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabletId = urlParams.get('presetId') || urlParams.get('tablet') || urlParams.get('t');
+    
+    if (tabletId) {
+      // URL 파라미터로 명시적 지정 시에도 디바이스 타입 추가
+      // 단, 이미 TABLET_, LAPTOP_ 등의 접두사가 있으면 그대로 사용
+      let deviceId;
+      if (tabletId.match(/^(TABLET_|LAPTOP_|MOBILE_|DESKTOP_)/i)) {
+        deviceId = tabletId.toUpperCase();
+      } else {
+        const deviceType = this._detectDeviceType().split('-')[0]; // HIGH/MEDIUM/LOW 제거
+        deviceId = `${deviceType}_${tabletId.toUpperCase()}`;
+      }
+      
+      // 자동 감지 우회를 위해 두 키 모두 저장
+      localStorage.setItem('dunlopillo_device_id', deviceId);
+      localStorage.setItem('dunlopillo_auto_device_id', deviceId);
+      console.log(`🔍 [Device] URL 파라미터에서 디바이스 ID 설정: ${deviceId}`);
+      return deviceId;
     }
     
     // 3. 디바이스 타입 감지

@@ -1,5 +1,7 @@
 # Dunlopillo MotionBed SPA
 
+> 📱 [디바이스 ID 설정 가이드](DEVICE_ID_SETUP.md) - 테블릿 ID 설정 방법
+
 > 던롭필로 모션베드 및 라텍스 매트리스 체험을 위한 인터랙티브 19페이지 SPA 애플리케이션
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/placeholder/deploy-status)](https://placeholder.netlify.app)

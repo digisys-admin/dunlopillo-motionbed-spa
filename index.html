@@ -1572,7 +1572,44 @@
       setInterval(updateScreenSizeDebug, 1000);
     </script>
 
-    <!-- 🚀 PWA Service Worker 등록 -->
+    <!-- � URL에서 디바이스 ID 추출 -->
+    <script>
+      // URL 경로에서 디바이스 ID 추출 (예: /TABLET_01)
+      function getDeviceIdFromUrl() {
+        console.log('🔍 URL 경로에서 디바이스 ID 추출 시도');
+        const path = window.location.pathname;
+        console.log('🔍 현재 URL 경로:', path);
+        
+        // 경로가 단순 슬래시나 index.html인 경우 제외
+        if (path === '/' || path === '/index.html') {
+          console.log('🔍 기본 경로 - 디바이스 ID 추출 건너뛰기');
+          return null;
+        }
+        
+        // 경로에서 슬래시 제거하고 ID 추출
+        const deviceId = path.replace(/^\//, '').replace(/\/index\.html$/, '');
+        
+        if (deviceId) {
+          console.log('🔍 URL에서 디바이스 ID 추출됨:', deviceId);
+          
+          // localStorage에 ID 저장
+          localStorage.setItem('dunlopillo_device_id', deviceId);
+          localStorage.setItem('dunlopillo_auto_device_id', deviceId);
+          
+          console.log('🔍 디바이스 ID 저장됨:', deviceId);
+          return deviceId;
+        }
+        
+        return null;
+      }
+      
+      // 페이지 로드 시 자동 실행
+      window.addEventListener('DOMContentLoaded', () => {
+        getDeviceIdFromUrl();
+      });
+    </script>
+    
+    <!-- �🚀 PWA Service Worker 등록 -->
     <script>
       // Service Worker 등록
       if ('serviceWorker' in navigator) {
