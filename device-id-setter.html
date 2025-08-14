@@ -102,10 +102,13 @@
         
         <div class="info-section">
             <p style="font-size: 18px; text-align: center; margin: 30px 0;">
-                <strong>이 페이지는 URL 파라미터를 통해 디바이스 ID를 자동으로 설정합니다.</strong><br>
+                <strong>이 페이지는 URL을 통해 디바이스 ID를 자동으로 설정합니다.</strong><br>
                 담당자가 제공한 링크를 클릭하여 디바이스 ID를 설정하세요.<br>
                 <small style="display: block; margin-top: 10px; color: #666;">
-                    URL 형식: ?tablet=XX 또는 ?presetId=XX (XX 부분에 원하는 ID 입력)
+                    URL 파라미터 형식: ?tablet=XX 또는 ?presetId=XX (XX 부분에 원하는 ID 입력)
+                </small>
+                <small style="display: block; margin-top: 5px; color: #666;">
+                    URL 경로 형식: /TABLET_XX (경로에 직접 ID 입력)
                 </small>
             </p>
         </div>
@@ -122,49 +125,77 @@
     <script>
     // 현재 설정된 디바이스 ID 표시
     window.onload = function() {
-        console.log('페이지 로드됨 - URL 파라미터 확인 시작');
+        console.log('페이지 로드됨 - URL 파라미터 및 경로 확인 시작');
         
-        // URL 파라미터에서 presetId가 있는지 확인
-        checkUrlParameters();
+        // URL 파라미터 및 경로에서 디바이스 ID 확인
+        const idFound = checkUrlParameters();
         
         // 현재 ID 표시
         showCurrentDeviceId();
         
-        // URL에 자동 ID 파라미터가 있으면 3초 후 메인 페이지로 리디렉션 (자동 리디렉션 활성화)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('presetId') || urlParams.get('tablet') || urlParams.get('t')) {
+        // ID가 설정되었으면 5초 후 메인 페이지로 리디렉션
+        if (idFound) {
+            console.log('5초 후 메인 페이지로 자동 이동합니다...');
             setTimeout(() => {
                 window.location.href = './index.html';
             }, 5000); // 5초 후 메인 페이지로 이동
         }
     };
 
-    // URL 파라미터 확인 및 자동 ID 설정
+    // URL 파라미터 및 경로 확인하여 자동 ID 설정
     function checkUrlParameters() {
+        // 1. URL 파라미터 확인 (기존 방식)
         const urlParams = new URLSearchParams(window.location.search);
         // survey-data-manager.js와 일치하도록 tablet 또는 t 파라미터도 확인
         const presetId = urlParams.get('presetId') || urlParams.get('tablet') || urlParams.get('t');
         
         console.log('URL 파라미터 확인:', urlParams.toString());
         
-        if (presetId) {
-            console.log('URL 파라미터에서 디바이스 ID 발견:', presetId);
+        // 2. URL 경로 확인 (새로운 방식)
+        const path = window.location.pathname;
+        console.log('URL 경로 확인:', path);
+        
+        // 경로에서 디바이스 ID 추출
+        let pathId = null;
+        if (path !== '/' && path !== '/index.html' && path !== '/device-id-setter.html') {
+            // 경로에서 슬래시 제거하고 ID 추출
+            pathId = path.replace(/^\//, '').replace(/\/index\.html$/, '').replace(/\/device-id-setter\.html$/, '');
+            
+            // 대문자 변환 및 접두사 확인
+            if (pathId) {
+                pathId = pathId.toUpperCase();
+                if (!pathId.startsWith('TABLET_') && !pathId.startsWith('LAPTOP_') && 
+                    !pathId.startsWith('MOBILE_') && !pathId.startsWith('DESKTOP_')) {
+                    pathId = 'TABLET_' + pathId;
+                }
+                console.log('URL 경로에서 디바이스 ID 발견:', pathId);
+            }
+        }
+        
+        // URL 파라미터 또는 경로에서 디바이스 ID 찾음
+        const finalId = presetId || pathId;
+        
+        if (finalId) {
+            console.log('디바이스 ID 발견:', finalId, presetId ? '(URL 파라미터)' : '(URL 경로)');
             
             // 자동으로 ID 저장
-            localStorage.setItem('dunlopillo_device_id', presetId);
+            localStorage.setItem('dunlopillo_device_id', finalId);
             // 기존 자동 감지 ID 덮어쓰기 방지
-            localStorage.setItem('dunlopillo_auto_device_id', presetId);
+            localStorage.setItem('dunlopillo_auto_device_id', finalId);
+            // URL 소스 표시
+            localStorage.setItem('dunlopillo_id_source', presetId ? 'url_param' : 'url_path');
+            localStorage.setItem('dunlopillo_device_id_locked', 'true');
             
-            console.log('디바이스 ID 저장됨:', presetId);
+            console.log('디바이스 ID 저장됨:', finalId);
             
             // 알림 표시
-            const resultMessage = `디바이스 ID가 성공적으로 설정되었습니다: ${presetId}`;
+            const resultMessage = `디바이스 ID가 성공적으로 설정되었습니다: ${finalId}`;
             showResult(resultMessage, 'success');
             alert(resultMessage); // 추가 알림으로 확실히 표시
             
             return true; // 성공적으로 ID 설정
         } else {
-            // presetId가 없을 경우 안내 메시지 표시
+            // ID가 없을 경우 안내 메시지 표시
             showResult('디바이스 ID 설정을 위해 담당자가 제공한 링크를 사용하세요.', 'info');
             return false; // ID 설정 없음
         }
@@ -172,9 +203,23 @@
 
     function showCurrentDeviceId() {
         const currentId = localStorage.getItem('dunlopillo_device_id') || '설정되지 않음';
+        const idSource = localStorage.getItem('dunlopillo_id_source') || '-';
         const resultMessage = `현재 설정된 디바이스 ID: ${currentId}`;
+        const sourceInfo = `설정 방식: ${getSourceName(idSource)}`;
+        
         document.getElementById('result').insertAdjacentHTML('beforeend', 
-            `<p style="margin-top: 15px; font-weight: bold;">${resultMessage}</p>`);
+            `<p style="margin-top: 15px; font-weight: bold;">${resultMessage}</p>
+             <p style="margin-top: 5px; color: #666;">${sourceInfo}</p>`);
+    }
+    
+    // ID 소스 이름 가져오기
+    function getSourceName(source) {
+        switch (source) {
+            case 'url_param': return 'URL 파라미터';
+            case 'url_path': return 'URL 경로';
+            case 'url_path_inline': return 'URL 경로 (인라인)';
+            default: return '자동 감지';
+        }
     }
     
     function showResult(message, type) {
