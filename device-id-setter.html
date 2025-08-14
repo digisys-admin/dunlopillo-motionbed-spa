@@ -161,13 +161,24 @@
             // 경로에서 슬래시 제거하고 ID 추출
             pathId = path.replace(/^\//, '').replace(/\/index\.html$/, '').replace(/\/device-id-setter\.html$/, '');
             
-            // 대문자 변환 및 접두사 확인
+            // 디버그를 위해 원본 값 기록
+            console.log('추출된 원본 경로 ID:', pathId);
+            
+            // 대문자 변환 및 접두사 확인 (더 강력한 처리)
             if (pathId) {
+                // 모든 내용을 대문자로 변환
                 pathId = pathId.toUpperCase();
-                if (!pathId.startsWith('TABLET_') && !pathId.startsWith('LAPTOP_') && 
-                    !pathId.startsWith('MOBILE_') && !pathId.startsWith('DESKTOP_')) {
+                
+                // 기존 접두사 제거 (대소문자 일관성 확보)
+                if (pathId.match(/^(TABLET_|LAPTOP_|MOBILE_|DESKTOP_|Tablet_|Laptop_|Mobile_|Desktop_)/i)) {
+                    // 접두사 제거 후 다시 올바른 대문자 접두사 추가
+                    const idPart = pathId.replace(/^(TABLET_|LAPTOP_|MOBILE_|DESKTOP_|Tablet_|Laptop_|Mobile_|Desktop_)/i, '');
+                    pathId = 'TABLET_' + idPart; // 항상 TABLET_ 접두사 사용
+                } else {
+                    // 접두사가 없으면 TABLET_ 추가
                     pathId = 'TABLET_' + pathId;
                 }
+                
                 console.log('URL 경로에서 디바이스 ID 발견:', pathId);
             }
         }
