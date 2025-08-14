@@ -103,7 +103,10 @@
         <div class="info-section">
             <p style="font-size: 18px; text-align: center; margin: 30px 0;">
                 <strong>이 페이지는 URL 파라미터를 통해 디바이스 ID를 자동으로 설정합니다.</strong><br>
-                담당자가 제공한 링크를 클릭하여 디바이스 ID를 설정하세요.
+                담당자가 제공한 링크를 클릭하여 디바이스 ID를 설정하세요.<br>
+                <small style="display: block; margin-top: 10px; color: #666;">
+                    URL 형식: ?tablet=XX 또는 ?presetId=XX (XX 부분에 원하는 ID 입력)
+                </small>
             </p>
         </div>
         
@@ -129,7 +132,7 @@
         
         // URL에 자동 ID 파라미터가 있으면 3초 후 메인 페이지로 리디렉션 (자동 리디렉션 활성화)
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('presetId')) {
+        if (urlParams.get('presetId') || urlParams.get('tablet') || urlParams.get('t')) {
             setTimeout(() => {
                 window.location.href = './index.html';
             }, 5000); // 5초 후 메인 페이지로 이동
@@ -139,7 +142,8 @@
     // URL 파라미터 확인 및 자동 ID 설정
     function checkUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
-        const presetId = urlParams.get('presetId');
+        // survey-data-manager.js와 일치하도록 tablet 또는 t 파라미터도 확인
+        const presetId = urlParams.get('presetId') || urlParams.get('tablet') || urlParams.get('t');
         
         console.log('URL 파라미터 확인:', urlParams.toString());
         
@@ -148,6 +152,8 @@
             
             // 자동으로 ID 저장
             localStorage.setItem('dunlopillo_device_id', presetId);
+            // 기존 자동 감지 ID 덮어쓰기 방지
+            localStorage.setItem('dunlopillo_auto_device_id', presetId);
             
             console.log('디바이스 ID 저장됨:', presetId);
             
