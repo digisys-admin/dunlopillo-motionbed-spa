@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>던롭필로 디바이스 ID 설정</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #1a5276;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .preset-section {
+            margin: 20px 0;
+        }
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .preset-btn {
+            background-color: #f1c40f;
+        }
+        .preset-btn:hover {
+            background-color: #f39c12;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #eaf7ea;
+            display: none;
+        }
+        .info-section {
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
+        }
+        .current-value {
+            font-weight: bold;
+            color: #2c3e50;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>던롭필로 디바이스 ID 설정</h1>
+        
+        <div class="input-group">
+            <label for="deviceId">디바이스 ID:</label>
+            <input type="text" id="deviceId" placeholder="예: TABLET_STATION1_001">
+        </div>
+        
+        <div class="preset-section">
+            <label>미리 설정된 ID:</label>
+            <div class="presets">
+                <button class="preset-btn" onclick="setPresetId('TABLET_STATION1_001')">매장1-태블릿1</button>
+                <button class="preset-btn" onclick="setPresetId('TABLET_STATION1_002')">매장1-태블릿2</button>
+                <button class="preset-btn" onclick="setPresetId('TABLET_STATION2_001')">매장2-태블릿1</button>
+                <button class="preset-btn" onclick="setPresetId('TABLET_STATION2_002')">매장2-태블릿2</button>
+            </div>
+        </div>
+        
+        <button id="saveBtn" onclick="saveDeviceId()">저장하기</button>
+        
+        <div id="result" class="result"></div>
+        
+        <div class="info-section">
+            <p><strong>현재 설정된 디바이스 ID:</strong> <span id="currentDeviceId" class="current-value">로딩 중...</span></p>
+            <p><strong>기기 자동 감지 ID:</strong> <span id="autoDeviceId" class="current-value">로딩 중...</span></p>
+            <p>* 이 페이지를 북마크에 추가하여 언제든지 디바이스 ID를 설정할 수 있습니다.</p>
+            <p>* 설정한 ID는 브라우저의 localStorage에 저장되며, 브라우저 데이터를 삭제하면 초기화됩니다.</p>
+        </div>
+    </div>
+
+    <script>
+    // 현재 설정된 디바이스 ID 표시
+    window.onload = function() {
+        console.log('페이지 로드됨 - URL 파라미터 확인 시작');
+        
+        // URL 파라미터에서 presetId가 있는지 확인
+        checkUrlParameters();
+        
+        // 현재 ID 표시
+        showCurrentDeviceId();
+        
+        // URL에 자동 ID 파라미터가 있으면 3초 후 메인 페이지로 리디렉션 (선택적)
+        // const urlParams = new URLSearchParams(window.location.search);
+        // if (urlParams.get('presetId') && urlParams.get('autoRedirect') === 'true') {
+        //     setTimeout(() => {
+        //         window.location.href = 'https://dunlopillo-spa-v2.netlify.app/';
+        //     }, 3000);
+        // }
+    };
+
+    // URL 파라미터 확인 및 자동 ID 설정
+    function checkUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const presetId = urlParams.get('presetId');
+        
+        console.log('URL 파라미터 확인:', urlParams.toString());
+        
+        if (presetId) {
+            console.log('URL 파라미터에서 디바이스 ID 발견:', presetId);
+            document.getElementById('deviceId').value = presetId;
+            
+            // 기존 자동 ID 확인
+            const currentAutoId = localStorage.getItem('dunlopillo_auto_device_id');
+            
+            // 자동으로 ID 저장
+            localStorage.setItem('dunlopillo_device_id', presetId);
+            
+            // 기존 자동 감지 ID 덮어쓰기 (이 부분은 선택적)
+            // localStorage.setItem('dunlopillo_auto_device_id', presetId);
+            
+            console.log('디바이스 ID 저장됨:', presetId);
+            
+            // 알림 표시 (메시지를 더 눈에 띄게)
+            const resultMessage = `URL 파라미터에서 디바이스 ID가 자동으로 설정되었습니다: ${presetId}`;
+            showResult(resultMessage, 'success');
+            alert(resultMessage); // 추가 알림으로 확실히 표시
+            
+            // 상태 표시 업데이트
+            setTimeout(showCurrentDeviceId, 100);
+            
+            return true; // 성공적으로 ID 설정
+        }
+        
+        return false; // ID 설정 없음
+    }
+
+    function showCurrentDeviceId() {
+        const currentId = localStorage.getItem('dunlopillo_device_id') || '설정되지 않음';
+        document.getElementById('currentDeviceId').textContent = currentId;
+        
+        // 자동 생성된 ID도 표시
+        let autoId = localStorage.getItem('dunlopillo_auto_device_id') || '감지되지 않음';
+        document.getElementById('autoDeviceId').textContent = autoId;
+    }        function setPresetId(id) {
+            document.getElementById('deviceId').value = id;
+        }
+
+        function saveDeviceId() {
+            const deviceId = document.getElementById('deviceId').value.trim();
+            
+            if (!deviceId) {
+                showResult('디바이스 ID를 입력해주세요.', 'error');
+                return;
+            }
+            
+            // 디바이스 ID 저장
+            localStorage.setItem('dunlopillo_device_id', deviceId);
+            
+            // 결과 표시
+            showResult(`디바이스 ID가 성공적으로 설정되었습니다: ${deviceId}`, 'success');
+            
+            // 현재 값 업데이트
+            showCurrentDeviceId();
+        }
+        
+        function showResult(message, type) {
+            const resultElement = document.getElementById('result');
+            if (!resultElement) {
+                console.error('결과 표시 요소를 찾을 수 없습니다!');
+                return;
+            }
+            
+            // 메시지를 더 눈에 띄게 설정
+            resultElement.textContent = message;
+            resultElement.style.display = 'block';
+            resultElement.style.padding = '15px';
+            resultElement.style.fontSize = '18px';
+            resultElement.style.fontWeight = 'bold';
+            resultElement.style.textAlign = 'center';
+            resultElement.style.borderWidth = '2px';
+            resultElement.style.borderStyle = 'solid';
+            
+            if (type === 'error') {
+                resultElement.style.backgroundColor = '#ffebee';
+                resultElement.style.color = '#c62828';
+                resultElement.style.borderColor = '#c62828';
+            } else {
+                resultElement.style.backgroundColor = '#e8f5e9';
+                resultElement.style.color = '#2e7d32';
+                resultElement.style.borderColor = '#2e7d32';
+            }
+            
+            console.log(`메시지 표시됨: ${message} (타입: ${type})`);
+            
+            // 10초 후 메시지 사라짐 (시간 증가)
+            setTimeout(() => {
+                resultElement.style.display = 'none';
+                console.log('메시지 숨겨짐');
+            }, 10000);
+        }
+    </script>
+</body>
+</html>
