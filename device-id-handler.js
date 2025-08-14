@@ -10,15 +10,27 @@
     // 경로가 단순 슬래시나 index.html이 아닌 경우
     if (path !== '/' && path !== '/index.html') {
       // 경로에서 슬래시 제거하고 ID 추출
-      const deviceId = path.replace(/^\//, '').replace(/\/index\.html$/, '');
+      let deviceId = path.replace(/^\//, '').replace(/\/index\.html$/, '');
       
       if (deviceId) {
+        // 대문자 변환 및 접두사 확인
+        deviceId = deviceId.toUpperCase();
+        if (!deviceId.startsWith('TABLET_') && !deviceId.startsWith('LAPTOP_') && 
+            !deviceId.startsWith('MOBILE_') && !deviceId.startsWith('DESKTOP_')) {
+          deviceId = 'TABLET_' + deviceId;
+        }
+        
         console.log('🔍 URL 경로에서 디바이스 ID 즉시 추출됨:', deviceId);
         
         try {
           // localStorage에 ID 저장 (양쪽 키에 모두 저장)
           localStorage.setItem('dunlopillo_device_id', deviceId);
           localStorage.setItem('dunlopillo_auto_device_id', deviceId);
+          
+          // 자동 감지 차단을 위한 특수 플래그
+          localStorage.setItem('dunlopillo_device_id_locked', 'true');
+          localStorage.setItem('dunlopillo_id_source', 'url_path');
+          
           console.log('🔍 디바이스 ID 즉시 저장됨:', deviceId);
           
           // 페이지 로드 시 재확인을 위한 플래그 설정

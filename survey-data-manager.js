@@ -301,6 +301,19 @@ class SurveyDataManager {
   _generateTabletId() {
     console.log('🔍 [Device] 디바이스 ID 생성 시작');
     
+    // URL 경로 기반으로 설정된 디바이스 ID가 있는지 확인 (최우선)
+    const idLocked = localStorage.getItem('dunlopillo_device_id_locked') === 'true';
+    const idSource = localStorage.getItem('dunlopillo_id_source');
+    
+    // 경로로 설정된 ID가 있으면 자동감지 건너뛰기
+    if (idLocked && idSource === 'url_path') {
+      const lockedId = localStorage.getItem('dunlopillo_device_id');
+      if (lockedId) {
+        console.log(`🔒 [Device] URL 경로로 설정된 디바이스 ID 발견 (잠금): ${lockedId}`);
+        return lockedId;
+      }
+    }
+    
     // 0. localStorage에 저장된 디바이스 ID가 있으면 먼저 확인
     // (URL 경로로 설정한 경우도 이 방식으로 이미 저장되어 있음)
     const storedDeviceId = localStorage.getItem('dunlopillo_device_id');
@@ -586,6 +599,14 @@ class SurveyDataManager {
    */
   _updateDeviceIdWithIP(detectedIP) {
     try {
+      // URL 경로로 설정된 경우 자동감지 중단
+      const idLocked = localStorage.getItem('dunlopillo_device_id_locked') === 'true';
+      const idSource = localStorage.getItem('dunlopillo_id_source');
+      if (idLocked && idSource === 'url_path') {
+        console.log('🔒 [Device] URL 경로로 설정된 디바이스 ID가 있음 - 자동 업데이트 건너뛰기');
+        return;
+      }
+      
       // 기존 저장된 디바이스 ID가 있고, URL 파라미터로 지정되지 않은 경우만 업데이트
       const urlParams = new URLSearchParams(window.location.search);
       const hasTabletParam = urlParams.get('tablet') || urlParams.get('t');
